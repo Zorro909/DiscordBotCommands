@@ -61,7 +61,7 @@ public class ChatLogCommand extends DiscordCommand {
 			cl.countMessages(m.getGuild());
 			for (ChatLogChannel clc : cl.listChannels(m.getGuild()).values()) {
 				for(ChatLogMessage clm : clc.clm) {
-					if(clm.content.length()<500&&clm.user.equalsIgnoreCase(m.getAuthor().getName())) {
+					if(clm.content.length()<500&&clm.user.equalsIgnoreCase(m.getMentionedUsers().get(0).getName())) {
 						msg.add(clm.content);
 					}
 				}
