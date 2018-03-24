@@ -58,6 +58,7 @@ public class ChatLogCommand extends DiscordCommand {
 			}
 			ArrayList<String> msg = new ArrayList<String>();
 			ChatLog cl =  CommandExecutor.getChatLog();
+			cl.countMessages(m.getGuild());
 			for (ChatLogChannel clc : cl.listChannels(m.getGuild()).values()) {
 				for(ChatLogMessage clm : clc.clm) {
 					if(clm.content.length()<500) {
