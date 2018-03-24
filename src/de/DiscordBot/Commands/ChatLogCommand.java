@@ -69,7 +69,7 @@ public class ChatLogCommand extends DiscordCommand {
 			if(msg.isEmpty()) {
 				return new MessageBuilder().append("Sorry... but this user never wrote anything while I was here").build();
 			} else {
-				return new EmbedBuilder().setAuthor(m.getMentionedUsers().get(0).getName()).setThumbnail(m.getMentionedUsers().get(0).getAvatarUrl()).addField("", msg.get(new Random().nextInt(msg.size())),true).build();
+				return new EmbedBuilder().setAuthor(m.getMentionedUsers().get(0).getName()).setThumbnail(m.getMentionedUsers().get(0).getAvatarUrl()).addField("", msg.get(new Random().nextInt(msg.size())),false).build();
 			}
 		}
 		return null;
