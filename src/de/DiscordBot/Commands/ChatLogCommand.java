@@ -26,7 +26,7 @@ public class ChatLogCommand extends DiscordCommand {
 	@Override
 	public Object execute(String command, String[] args, Message m) {
 		if(args.length==0||args[0]==null) {
-			return new MessageBuilder().append("Usage: " + getUsage());
+			return new MessageBuilder().append("Usage: " + getUsage()).build();
 		}
 		if(args[0].equalsIgnoreCase("stats")) {
 			ChatLog cl =  CommandExecutor.getChatLog();
@@ -54,7 +54,7 @@ public class ChatLogCommand extends DiscordCommand {
 			return eb.build();
 		}else if(args[0].equalsIgnoreCase("quote")) {
 			if(m.getMentionedUsers().isEmpty()) {
-				return new MessageBuilder().append("Usage: \\chatlog quote @Mention");
+				return new MessageBuilder().append("Usage: \\chatlog quote @Mention").build();
 			}
 			ArrayList<String> msg = new ArrayList<String>();
 			ChatLog cl =  CommandExecutor.getChatLog();
