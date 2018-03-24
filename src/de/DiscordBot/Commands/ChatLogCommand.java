@@ -72,7 +72,7 @@ public class ChatLogCommand extends DiscordCommand {
 				return new EmbedBuilder().setAuthor(m.getMentionedUsers().get(0).getName()).setThumbnail(m.getMentionedUsers().get(0).getAvatarUrl()).addField("", msg.get(new Random().nextInt(msg.size())),false).build();
 			}
 		}
-		return null;
+		return new MessageBuilder().append("Usage: " + getUsage()).build();
 	}
 
 	@Override
