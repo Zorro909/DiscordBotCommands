@@ -19,13 +19,13 @@ import net.dv8tion.jda.core.entities.MessageEmbed.Field;
 public class ChatLogCommand extends DiscordCommand {
 
 	public ChatLogCommand() {
-		super("chatlog", new String[] {"clog"}, "You can view stats for the logged ChatLog of the Bot here", "\\chatlog [stats|loadChannel]");
+		super("chatlog", new String[] {"clog"}, "You can view stats for the logged ChatLog of the Bot here", "\\chatlog [stats|quote] {Mention}");
 		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	public Object execute(String command, String[] args, Message m) {
-		if(args.length==0) {
+		if(args.length==0||args[0]==null) {
 			return new MessageBuilder().append("Usage: " + getUsage());
 		}
 		if(args[0].equalsIgnoreCase("stats")) {
@@ -61,7 +61,7 @@ public class ChatLogCommand extends DiscordCommand {
 			cl.countMessages(m.getGuild());
 			for (ChatLogChannel clc : cl.listChannels(m.getGuild()).values()) {
 				for(ChatLogMessage clm : clc.clm) {
-					if(clm.content.length()<500) {
+					if(clm.content.length()<500&&clm.user.equalsIgnoreCase(m.getAuthor().getName())) {
 						msg.add(clm.content);
 					}
 				}
