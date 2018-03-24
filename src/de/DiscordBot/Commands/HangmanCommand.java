@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import de.DiscordBot.DiscordBot;
 import de.DiscordBot.Config.Config;
 import de.DiscordBot.Config.ConfigPage;
 import de.DiscordBot.Config.ConfigurableOption;
@@ -26,7 +27,7 @@ public class HangmanCommand extends DiscordCommand implements EventListener {
 
   List<String> wordlist;
 
-  public HangmanCommand(JDA bot) {
+  public HangmanCommand() {
     super("hangman", new String[] {}, "Let's you play a round of Hangman", "\\hangman");
 
     try {
@@ -35,7 +36,7 @@ public class HangmanCommand extends DiscordCommand implements EventListener {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-    bot.addEventListener(this);
+    DiscordBot.getBot().addEventListener(this);
   }
 
   HashMap<MessageChannel, Game> state = new HashMap<MessageChannel, Game>();
