@@ -98,7 +98,7 @@ public class BeardAvatar extends DiscordCommand{
                 .sendFile(
                         cache, m.getMentionedUsers().get(0) + ".png",
                         new MessageBuilder()
-                                .append(m.getMentionedUsers().get(0) + " with Beard! :joy:").build())
+                                .append(m.getMentionedUsers().get(0).getAsMention() + " with Beard! :joy:").build())
                 .complete();
         cache.delete();
         return "";
