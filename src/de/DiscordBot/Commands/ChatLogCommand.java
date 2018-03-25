@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,9 +79,10 @@ public class ChatLogCommand extends DiscordCommand {
 			cl.countMessages(m.getGuild());
 
 			LinkedHashMap<String, Integer> enc = getSortedCountedMessages(m.getGuild());
-
+			Iterator<String> it = enc.keySet().iterator();
 			for (int i = 1; i <= 10; i++) {
-				String msg = enc.keySet().iterator().next();
+				if(!it.hasNext())break;
+				String msg = it.next();
 				eb.addField(new Field(i + ". (" + enc.get(msg) + "):", (msg.length() > 256 ? msg.substring(0,250) + "..." : "") , true));
 			}
 			return eb.build();
