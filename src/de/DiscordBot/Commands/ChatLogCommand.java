@@ -137,23 +137,26 @@ public class ChatLogCommand extends DiscordCommand {
 
 			}).start();
 			while (loading) {
-				Iterator<Message> im = mh.getRetrievedHistory().iterator();
-				while (im.hasNext() || loading) {
-					Message me = im.next();
-					if (clc.clm.get(i).time > me.getCreationTime().toEpochSecond()) {
-						clc.addChatMessage(me.getAuthor(), me);
-						if (me.getAuthor().getName().equalsIgnoreCase(m.getAuthor().getName())) {
-							authorMessages++;
-						}
-						added++;
-					}
-					if (!im.hasNext()) {
+				List<Message> im = mh.getRetrievedHistory();
+				int l = 0;
+				while (im.size()>l || loading) {
+					if (im.size()<=l) {
 						try {
 							Thread.sleep(1000l);
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
+						im = mh.getRetrievedHistory();
+						continue;
+					}
+					Message me = im.get(l);
+					if (clc.clm.get(i).time > me.getCreationTime().toEpochSecond()) {
+						clc.addChatMessage(me.getAuthor(), me);
+						if (me.getAuthor().getName().equalsIgnoreCase(m.getAuthor().getName())) {
+							authorMessages++;
+						}
+						added++;
 					}
 					if (tim + 5000 < System.currentTimeMillis()) {
 						eb = new EmbedBuilder();
@@ -171,6 +174,7 @@ public class ChatLogCommand extends DiscordCommand {
 						});
 						tim = System.currentTimeMillis();
 					}
+					l++;
 				}
 			}
 			eb = new EmbedBuilder();
