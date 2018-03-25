@@ -95,7 +95,7 @@ public class ChatLogCommand extends DiscordCommand {
 						(msg.getKey().length() > 256 ? msg.getKey().substring(0, 250) + "..." : msg.getKey()), true));
 			}
 			return eb.build();
-		} else if (args[0].equalsIgnoreCase("loadChannel")) {
+		} else if (args[0].equalsIgnoreCase("loadChannel")&&false) {
 			ChatLog cl = CommandExecutor.getChatLog();
 			ChatLogChannel clc = cl.getChannel(m.getGuild(), m.getChannel().getName());
 			clc.load();
