@@ -120,18 +120,27 @@ public class ChatLogCommand extends DiscordCommand {
 			new Thread(new Runnable() {
 
 				int count = 0;
-
+				int running = 0;
+				
 				@Override
 				public void run() {
 					while (true) {
+						running++;
 						mh.retrievePast(100).submit().thenAccept((mes) -> {
 							if (mes.size() == 0) {
 								count++;
 								if (count == 5) {
 									loading = false;
 								}
+								running--;
 							}
 						});
+						try {
+							Thread.sleep(running*100l);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
 				}
 
