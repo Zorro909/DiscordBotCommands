@@ -36,8 +36,9 @@ public class ChatLogCommand extends DiscordCommand {
 				"\\chatlog [stats|quote] {Mention}");
 		// TODO Auto-generated constructor stub
 	}
-	
+
 	private static Message show;
+	private static boolean loading = true;
 
 	@Override
 	public Object execute(String command, String[] args, Message m) {
@@ -113,37 +114,63 @@ public class ChatLogCommand extends DiscordCommand {
 			show = m.getChannel().sendMessage(mem).complete();
 
 			MessageHistory mh = new MessageHistory(m.getChannel());
-			List<Message> mess = null;
 			int i = clc.clm.size() - 1;
 			long tim = System.currentTimeMillis();
 			long added = 0;
-			while ((mess = mh.retrievePast(50).complete()).size() != 0) {
-				for (Message me : mess) {
+			new Thread(new Runnable() {
+
+				int count = 0;
+
+				@Override
+				public void run() {
+					while (true) {
+						mh.retrievePast(100).submit().thenAccept((mes) -> {
+							if (mes.size() == 0) {
+								count++;
+								if (count == 5) {
+									loading = false;
+								}
+							}
+						});
+					}
+				}
+
+			}).start();
+			while (loading) {
+				Iterator<Message> im = mh.getRetrievedHistory().iterator();
+				while (im.hasNext() || loading) {
+					Message me = im.next();
 					if (clc.clm.get(i).time > me.getCreationTime().toEpochSecond()) {
 						clc.addChatMessage(me.getAuthor(), me);
 						if (me.getAuthor().getName().equalsIgnoreCase(m.getAuthor().getName())) {
 							authorMessages++;
 						}
 						added++;
-						break;
-					} else {
-						continue;
 					}
-				}
-				if (tim + 5000 < System.currentTimeMillis()) {
-					eb = new EmbedBuilder();
-					eb.setTitle("Chatlog | Stats | " + m.getTextChannel().getName());
-					eb.addField("Already retrieved Messages", (added + clc.clm.size()) + "", false);
-					eb.addField("Newly retrieved Messages", added + "", false);
-					eb.addField("Your Participation", ((authorMessages / (clc.clm.size() + added)) * 100) + "%", false);
-					show.editMessage(eb.build()).submit().thenAccept(new Consumer<Message>() {
-
-						@Override
-						public void accept(Message arg0) {
-							show = arg0;
+					if (!im.hasNext()) {
+						try {
+							Thread.sleep(1000l);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
 						}
-					});
-					tim = System.currentTimeMillis();
+					}
+					if (tim + 5000 < System.currentTimeMillis()) {
+						eb = new EmbedBuilder();
+						eb.setTitle("Chatlog | Stats | " + m.getTextChannel().getName());
+						eb.addField("Already retrieved Messages", (added + clc.clm.size()) + "", false);
+						eb.addField("Newly retrieved Messages", added + "", false);
+						eb.addField("Your Participation", ((authorMessages / (clc.clm.size() + added)) * 100) + "%",
+								false);
+						show.editMessage(eb.build()).submit().thenAccept(new Consumer<Message>() {
+
+							@Override
+							public void accept(Message arg0) {
+								show = arg0;
+							}
+						});
+						tim = System.currentTimeMillis();
+					}
 				}
 			}
 			eb = new EmbedBuilder();
