@@ -24,6 +24,8 @@ import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.MessageEmbed;
+import net.dv8tion.jda.core.entities.MessageHistory;
 import net.dv8tion.jda.core.entities.MessageEmbed.Field;
 
 public class ChatLogCommand extends DiscordCommand {
@@ -87,6 +89,55 @@ public class ChatLogCommand extends DiscordCommand {
 				eb.addField(new Field(i + ". (" + msg.getValue() + "):", (msg.getKey().length() > 256 ? msg.getKey().substring(0,250) + "..." : msg.getKey()) , true));
 			}
 			return eb.build();
+		} else if(args[0].equalsIgnoreCase("loadChannel")) {
+			ChatLog cl = CommandExecutor.getChatLog();
+			ChatLogChannel clc = cl.getChannel(m.getGuild(), m.getChannel().getName());
+			clc.load();
+			int authorMessages = 0;
+			for(ChatLogMessage clm : clc.clm) {
+				if(clm.user.equalsIgnoreCase(m.getAuthor().getName())) {
+					authorMessages++;
+				}
+			}			
+			EmbedBuilder eb = new EmbedBuilder();
+			eb.setTitle("Chatlog | Stats | " + m.getTextChannel().getName());
+			eb.addField("Already retrieved Messages", clc.clm.size() + "", false);
+			eb.addField("Newly retrieved Messages", "0", false);
+			eb.addField("Your Participation", ((authorMessages / clc.clm.size())*100) + "%", false);
+			MessageEmbed mem = eb.build();
+			Message show = m.getChannel().sendMessage(mem).complete();
+			
+			MessageHistory mh = new MessageHistory(m.getChannel());
+			List<Message> mess = null;
+			int i = clc.clm.size();
+			long tim = System.currentTimeMillis();
+			long added = 0;
+			while((mess=mh.retrievePast(100).complete()).size()!=0) {
+				for(Message me : mess) {
+					OUTER:
+					for(;i > 0; i--) {
+						if(clc.clm.get(i).time<me.getCreationTime().toEpochSecond()) {
+							clc.addChatMessage(me.getAuthor(), me);
+							if(me.getAuthor().getName().equalsIgnoreCase(m.getAuthor().getName())) {
+								authorMessages++;
+							}
+							added++;
+							break;
+						} else {
+							continue OUTER;
+						}
+					}
+				}
+				if(tim+2000<System.currentTimeMillis()) {
+					eb = new EmbedBuilder();
+					eb.setTitle("Chatlog | Stats | " + m.getTextChannel().getName());
+					eb.addField("Already retrieved Messages", (added+clc.clm.size()) + "", false);
+					eb.addField("Newly retrieved Messages", added + "", false);
+					eb.addField("Your Participation", ((authorMessages / clc.clm.size())*100) + "%", false);
+					show.editMessage(eb.build()).submit();
+				}
+			}
+			m.getTextChannel().sendMessage("Finished " + m.getAuthor().getAsMention()).submit();
 		}
 		return new MessageBuilder().append("Usage: " + getUsage()).build();
 	}
