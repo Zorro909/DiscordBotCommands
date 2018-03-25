@@ -124,7 +124,7 @@ public class ChatLogCommand extends DiscordCommand {
 				
 				@Override
 				public void run() {
-					while (true) {
+					while (loading) {
 						running++;
 						mh.retrievePast(100).submit().thenAccept((mes) -> {
 							if (mes.size() == 0) {
