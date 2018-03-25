@@ -30,7 +30,7 @@ public class BeardAvatar extends DiscordCommand{
   private static void init() {
     if (beard == null) {
       try {
-        beard = ImageIO.read(BeardAvatar.class.getResourceAsStream("beard.png"));
+        beard = ImageIO.read(BeardAvatar.class.getResourceAsStream("/beard.png"));
       } catch (IOException e) {
         // TODO Auto-generated catch block
         e.printStackTrace();
