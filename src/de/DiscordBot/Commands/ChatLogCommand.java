@@ -109,7 +109,7 @@ public class ChatLogCommand extends DiscordCommand {
 			
 			MessageHistory mh = new MessageHistory(m.getChannel());
 			List<Message> mess = null;
-			int i = clc.clm.size();
+			int i = clc.clm.size()-1;
 			long tim = System.currentTimeMillis();
 			long added = 0;
 			while((mess=mh.retrievePast(100).complete()).size()!=0) {
