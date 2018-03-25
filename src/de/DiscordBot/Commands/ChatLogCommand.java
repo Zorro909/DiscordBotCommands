@@ -117,7 +117,7 @@ public class ChatLogCommand extends DiscordCommand {
 			int i = clc.clm.size() - 1;
 			long tim = System.currentTimeMillis();
 			long added = 0;
-			while ((mess = mh.retrievePast(100).complete()).size() != 0) {
+			while ((mess = mh.retrievePast(50).complete()).size() != 0) {
 				for (Message me : mess) {
 					if (clc.clm.get(i).time > me.getCreationTime().toEpochSecond()) {
 						clc.addChatMessage(me.getAuthor(), me);
@@ -135,7 +135,7 @@ public class ChatLogCommand extends DiscordCommand {
 					eb.setTitle("Chatlog | Stats | " + m.getTextChannel().getName());
 					eb.addField("Already retrieved Messages", (added + clc.clm.size()) + "", false);
 					eb.addField("Newly retrieved Messages", added + "", false);
-					eb.addField("Your Participation", ((authorMessages / clc.clm.size()) * 100) + "%", false);
+					eb.addField("Your Participation", ((authorMessages / (clc.clm.size() + added)) * 100) + "%", false);
 					show.editMessage(eb.build()).submit().thenAccept(new Consumer<Message>() {
 
 						@Override
@@ -150,7 +150,7 @@ public class ChatLogCommand extends DiscordCommand {
 			eb.setTitle("Chatlog | Stats | " + m.getTextChannel().getName());
 			eb.addField("Already retrieved Messages", (added + clc.clm.size()) + "", false);
 			eb.addField("Newly retrieved Messages", added + "", false);
-			eb.addField("Your Participation", ((authorMessages / clc.clm.size()) * 100) + "%", false);
+			eb.addField("Your Participation", ((authorMessages / (clc.clm.size() + added)) * 100) + "%", false);
 			show.delete().submit();
 			m.getTextChannel().sendMessage(eb.build()).submit();
 			m.getTextChannel().sendMessage("Finished " + m.getAuthor().getAsMention()).submit();
