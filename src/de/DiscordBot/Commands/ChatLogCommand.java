@@ -79,8 +79,8 @@ public class ChatLogCommand extends DiscordCommand {
 
 			LinkedHashMap<String, Integer> enc = getSortedCountedMessages(m.getGuild());
 
-			String msg = enc.keySet().iterator().next();
 			for (int i = 1; i <= 10; i++) {
+				String msg = enc.keySet().iterator().next();
 				eb.addField(new Field(i + ". (" + enc.get(msg) + "):", (msg.length() > 256 ? msg.substring(0,250) + "..." : "") , true));
 			}
 			return eb.build();
@@ -105,7 +105,7 @@ public class ChatLogCommand extends DiscordCommand {
 		List<Map.Entry<String, Integer>> entries = new ArrayList<Map.Entry<String, Integer>>();
 		Collections.sort(entries, new Comparator<Map.Entry<String, Integer>>() {
 			public int compare(Map.Entry<String, Integer> a, Map.Entry<String, Integer> b) {
-				return a.getValue().compareTo(b.getValue());
+				return -1*a.getValue().compareTo(b.getValue());
 			}
 		});
 		return encounter;
