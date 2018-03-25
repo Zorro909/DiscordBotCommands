@@ -30,7 +30,7 @@ public class BeardAvatar extends DiscordCommand{
   private static void init() {
     if (beard == null) {
       try {
-        beard = ImageIO.read(new File("beard.png"));
+        beard = ImageIO.read(BeardAvatar.class.getResourceAsStream("beard.png"));
       } catch (IOException e) {
         // TODO Auto-generated catch block
         e.printStackTrace();
@@ -70,7 +70,7 @@ public class BeardAvatar extends DiscordCommand{
       try {
         BufferedImage bi = getAvatar(m.getAuthor());
         bi.getGraphics().drawImage(
-                beard, bi.getWidth() / 4, bi.getHeight() / 4, bi.getWidth() / 2, bi.getHeight() / 2,
+                beard, bi.getWidth() / 4, bi.getHeight() / 3, bi.getWidth() / 2, bi.getHeight() / 2,
                 null);
         File cache = new File(new Random().nextInt(9999) + ".png");
         ImageIO.write(bi, "png", cache);
@@ -90,7 +90,7 @@ public class BeardAvatar extends DiscordCommand{
       try {
         BufferedImage bi = getAvatar(m.getMentionedUsers().get(0));
         bi.getGraphics().drawImage(
-                beard, bi.getWidth() / 4, bi.getHeight() / 4, bi.getWidth() / 2, bi.getHeight() / 2,
+                beard, bi.getWidth() / 4, bi.getHeight() / 3, bi.getWidth() / 2, bi.getHeight() / 2,
                 null);
         File cache = new File(new Random().nextInt(9999) + ".png");
         ImageIO.write(bi, "png", cache);
