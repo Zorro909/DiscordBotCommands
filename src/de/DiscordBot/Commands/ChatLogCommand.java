@@ -99,7 +99,7 @@ public class ChatLogCommand extends DiscordCommand {
 			ChatLog cl = CommandExecutor.getChatLog();
 			ChatLogChannel clc = cl.getChannel(m.getGuild(), m.getChannel().getName());
 			clc.load();
-			int authorMessages = 0;
+			double authorMessages = 0;
 			for (ChatLogMessage clm : clc.clm) {
 				if (clm.user.equalsIgnoreCase(m.getAuthor().getName())) {
 					authorMessages++;
@@ -109,7 +109,7 @@ public class ChatLogCommand extends DiscordCommand {
 			eb.setTitle("Chatlog | Stats | " + m.getTextChannel().getName());
 			eb.addField("Already retrieved Messages", clc.clm.size() + "", false);
 			eb.addField("Newly retrieved Messages", "0", false);
-			eb.addField("Your Participation", ((authorMessages / clc.clm.size()) * 100) + "%", false);
+			eb.addField("Your Participation", ((authorMessages / (double)clc.clm.size()) * 100.0) + "%", false);
 			MessageEmbed mem = eb.build();
 			show = m.getChannel().sendMessage(mem).complete();
 
@@ -136,7 +136,7 @@ public class ChatLogCommand extends DiscordCommand {
 							}
 						});
 						try {
-							Thread.sleep(running*100l);
+							Thread.sleep(running*50l);
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -172,7 +172,7 @@ public class ChatLogCommand extends DiscordCommand {
 						eb.setTitle("Chatlog | Stats | " + m.getTextChannel().getName());
 						eb.addField("Already retrieved Messages", (added + clc.clm.size()) + "", false);
 						eb.addField("Newly retrieved Messages", added + "", false);
-						eb.addField("Your Participation", ((authorMessages / (clc.clm.size() + added)) * 100) + "%",
+						eb.addField("Your Participation", ((authorMessages / (double)(clc.clm.size() + added)) * 100.0) + "%",
 								false);
 						show.editMessage(eb.build()).submit().thenAccept(new Consumer<Message>() {
 
@@ -190,7 +190,7 @@ public class ChatLogCommand extends DiscordCommand {
 			eb.setTitle("Chatlog | Stats | " + m.getTextChannel().getName());
 			eb.addField("Already retrieved Messages", (added + clc.clm.size()) + "", false);
 			eb.addField("Newly retrieved Messages", added + "", false);
-			eb.addField("Your Participation", ((authorMessages / (clc.clm.size() + added)) * 100) + "%", false);
+			eb.addField("Your Participation", ((authorMessages / (double)(clc.clm.size() + added)) * 100.0) + "%", false);
 			show.delete().submit();
 			m.getTextChannel().sendMessage(eb.build()).submit();
 			m.getTextChannel().sendMessage("Finished " + m.getAuthor().getAsMention()).submit();
