@@ -128,13 +128,14 @@ public class ChatLogCommand extends DiscordCommand {
 						}
 					}
 				}
-				if(tim+2000<System.currentTimeMillis()) {
+				if(tim+4000<System.currentTimeMillis()) {
 					eb = new EmbedBuilder();
 					eb.setTitle("Chatlog | Stats | " + m.getTextChannel().getName());
 					eb.addField("Already retrieved Messages", (added+clc.clm.size()) + "", false);
 					eb.addField("Newly retrieved Messages", added + "", false);
 					eb.addField("Your Participation", ((authorMessages / clc.clm.size())*100) + "%", false);
 					show.editMessage(eb.build()).submit();
+					tim = System.currentTimeMillis();
 				}
 			}
 			m.getTextChannel().sendMessage("Finished " + m.getAuthor().getAsMention()).submit();
