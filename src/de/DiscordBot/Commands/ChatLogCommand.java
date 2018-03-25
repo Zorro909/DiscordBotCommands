@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Consumer;
 import java.util.Random;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -35,6 +36,8 @@ public class ChatLogCommand extends DiscordCommand {
 				"\\chatlog [stats|quote] {Mention}");
 		// TODO Auto-generated constructor stub
 	}
+	
+	private static Message show;
 
 	@Override
 	public Object execute(String command, String[] args, Message m) {
@@ -84,61 +87,74 @@ public class ChatLogCommand extends DiscordCommand {
 			List<Entry<String, Integer>> enc = getSortedCountedMessages(m.getGuild());
 			Iterator<Entry<String, Integer>> it = enc.iterator();
 			for (int i = 1; i <= 10; i++) {
-				if(!it.hasNext())break;
+				if (!it.hasNext())
+					break;
 				Entry<String, Integer> msg = it.next();
-				eb.addField(new Field(i + ". (" + msg.getValue() + "):", (msg.getKey().length() > 256 ? msg.getKey().substring(0,250) + "..." : msg.getKey()) , true));
+				eb.addField(new Field(i + ". (" + msg.getValue() + "):",
+						(msg.getKey().length() > 256 ? msg.getKey().substring(0, 250) + "..." : msg.getKey()), true));
 			}
 			return eb.build();
-		} else if(args[0].equalsIgnoreCase("loadChannel")) {
+		} else if (args[0].equalsIgnoreCase("loadChannel")) {
 			ChatLog cl = CommandExecutor.getChatLog();
 			ChatLogChannel clc = cl.getChannel(m.getGuild(), m.getChannel().getName());
 			clc.load();
 			int authorMessages = 0;
-			for(ChatLogMessage clm : clc.clm) {
-				if(clm.user.equalsIgnoreCase(m.getAuthor().getName())) {
+			for (ChatLogMessage clm : clc.clm) {
+				if (clm.user.equalsIgnoreCase(m.getAuthor().getName())) {
 					authorMessages++;
 				}
-			}			
+			}
 			EmbedBuilder eb = new EmbedBuilder();
 			eb.setTitle("Chatlog | Stats | " + m.getTextChannel().getName());
 			eb.addField("Already retrieved Messages", clc.clm.size() + "", false);
 			eb.addField("Newly retrieved Messages", "0", false);
-			eb.addField("Your Participation", ((authorMessages / clc.clm.size())*100) + "%", false);
+			eb.addField("Your Participation", ((authorMessages / clc.clm.size()) * 100) + "%", false);
 			MessageEmbed mem = eb.build();
-			Message show = m.getChannel().sendMessage(mem).complete();
-			
+			show = m.getChannel().sendMessage(mem).complete();
+
 			MessageHistory mh = new MessageHistory(m.getChannel());
 			List<Message> mess = null;
-			int i = clc.clm.size()-1;
+			int i = clc.clm.size() - 1;
 			long tim = System.currentTimeMillis();
 			long added = 0;
-			while((mess=mh.retrievePast(100).complete()).size()!=0) {
-				for(Message me : mess) {
-					OUTER:
-					for(;i > 0; i--) {
-						if(clc.clm.get(i).time<me.getCreationTime().toEpochSecond()) {
-							clc.addChatMessage(me.getAuthor(), me);
-							if(me.getAuthor().getName().equalsIgnoreCase(m.getAuthor().getName())) {
-								authorMessages++;
-							}
-							added++;
-							break;
-						} else {
-							continue OUTER;
+			while ((mess = mh.retrievePast(100).complete()).size() != 0) {
+				for (Message me : mess) {
+					if (clc.clm.get(i).time < me.getCreationTime().toEpochSecond()) {
+						clc.addChatMessage(me.getAuthor(), me);
+						if (me.getAuthor().getName().equalsIgnoreCase(m.getAuthor().getName())) {
+							authorMessages++;
 						}
+						added++;
+						break;
+					} else {
+						continue;
 					}
 				}
-				if(tim+4000<System.currentTimeMillis()) {
+				if (tim + 5000 < System.currentTimeMillis()) {
 					eb = new EmbedBuilder();
 					eb.setTitle("Chatlog | Stats | " + m.getTextChannel().getName());
-					eb.addField("Already retrieved Messages", (added+clc.clm.size()) + "", false);
+					eb.addField("Already retrieved Messages", (added + clc.clm.size()) + "", false);
 					eb.addField("Newly retrieved Messages", added + "", false);
-					eb.addField("Your Participation", ((authorMessages / clc.clm.size())*100) + "%", false);
-					show.editMessage(eb.build()).submit();
+					eb.addField("Your Participation", ((authorMessages / clc.clm.size()) * 100) + "%", false);
+					show.editMessage(eb.build()).submit().thenAccept(new Consumer<Message>() {
+
+						@Override
+						public void accept(Message arg0) {
+							show = arg0;
+						}
+					});
 					tim = System.currentTimeMillis();
 				}
 			}
+			eb = new EmbedBuilder();
+			eb.setTitle("Chatlog | Stats | " + m.getTextChannel().getName());
+			eb.addField("Already retrieved Messages", (added + clc.clm.size()) + "", false);
+			eb.addField("Newly retrieved Messages", added + "", false);
+			eb.addField("Your Participation", ((authorMessages / clc.clm.size()) * 100) + "%", false);
+			show.delete().submit();
+			m.getTextChannel().sendMessage(eb.build()).submit();
 			m.getTextChannel().sendMessage("Finished " + m.getAuthor().getAsMention()).submit();
+			return null;
 		}
 		return new MessageBuilder().append("Usage: " + getUsage()).build();
 	}
@@ -161,7 +177,7 @@ public class ChatLogCommand extends DiscordCommand {
 		entries.addAll(encounter.entrySet());
 		Collections.sort(entries, new Comparator<Map.Entry<String, Integer>>() {
 			public int compare(Map.Entry<String, Integer> a, Map.Entry<String, Integer> b) {
-				return -1*a.getValue().compareTo(b.getValue());
+				return -1 * a.getValue().compareTo(b.getValue());
 			}
 		});
 		return entries;
