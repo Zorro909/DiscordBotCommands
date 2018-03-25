@@ -119,7 +119,7 @@ public class ChatLogCommand extends DiscordCommand {
 			long added = 0;
 			while ((mess = mh.retrievePast(100).complete()).size() != 0) {
 				for (Message me : mess) {
-					if (clc.clm.get(i).time < me.getCreationTime().toEpochSecond()) {
+					if (clc.clm.get(i).time > me.getCreationTime().toEpochSecond()) {
 						clc.addChatMessage(me.getAuthor(), me);
 						if (me.getAuthor().getName().equalsIgnoreCase(m.getAuthor().getName())) {
 							authorMessages++;
