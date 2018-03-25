@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -44,10 +45,10 @@ public class ChatLogCommand extends DiscordCommand {
 			eb.setTitle("Chatlog Stats");
 			eb.addField(new Field("Total Messages captured", cl.countMessages(m.getGuild()) + "", true));
 
-			LinkedHashMap<String, Integer> enc = getSortedCountedMessages(m.getGuild());
+			List<Entry<String, Integer>> enc = getSortedCountedMessages(m.getGuild());
 
-			String msg = enc.keySet().iterator().next();
-			eb.addField(new Field("Most sent Message (" + enc.get(msg) + "):", msg + "", false));
+			Entry<String, Integer> msg = enc.iterator().next();
+			eb.addField(new Field("Most sent Message (" + msg.getValue() + "):", msg.getKey() + "", false));
 			return eb.build();
 		} else if (args[0].equalsIgnoreCase("quote")) {
 			if (m.getMentionedUsers().isEmpty()) {
@@ -78,19 +79,19 @@ public class ChatLogCommand extends DiscordCommand {
 			eb.setTitle("Chatlog Wordranking");
 			cl.countMessages(m.getGuild());
 
-			LinkedHashMap<String, Integer> enc = getSortedCountedMessages(m.getGuild());
-			Iterator<String> it = enc.keySet().iterator();
+			List<Entry<String, Integer>> enc = getSortedCountedMessages(m.getGuild());
+			Iterator<Entry<String, Integer>> it = enc.iterator();
 			for (int i = 1; i <= 10; i++) {
 				if(!it.hasNext())break;
-				String msg = it.next();
-				eb.addField(new Field(i + ". (" + enc.get(msg) + "):", (msg.length() > 256 ? msg.substring(0,250) + "..." : "") , true));
+				Entry<String, Integer> msg = it.next();
+				eb.addField(new Field(i + ". (" + msg.getValue() + "):", (msg.getKey().length() > 256 ? msg.getKey().substring(0,250) + "..." : msg.getKey()) , true));
 			}
 			return eb.build();
 		}
 		return new MessageBuilder().append("Usage: " + getUsage()).build();
 	}
 
-	public LinkedHashMap<String, Integer> getSortedCountedMessages(Guild g) {
+	public List<Entry<String, Integer>> getSortedCountedMessages(Guild g) {
 		LinkedHashMap<String, Integer> encounter = new LinkedHashMap<String, Integer>();
 		for (ChatLogChannel clc : CommandExecutor.getChatLog().listChannels(g).values()) {
 			for (ChatLogMessage clm : clc.clm) {
@@ -105,12 +106,13 @@ public class ChatLogCommand extends DiscordCommand {
 		}
 
 		List<Map.Entry<String, Integer>> entries = new ArrayList<Map.Entry<String, Integer>>();
+		entries.addAll(encounter.entrySet());
 		Collections.sort(entries, new Comparator<Map.Entry<String, Integer>>() {
 			public int compare(Map.Entry<String, Integer> a, Map.Entry<String, Integer> b) {
 				return -1*a.getValue().compareTo(b.getValue());
 			}
 		});
-		return encounter;
+		return entries;
 	}
 
 	@Override
