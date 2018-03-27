@@ -245,7 +245,7 @@ public class MusicService extends DiscordService {
 					if (gmrae.getReaction().isSelf()) {
 						return;
 					}
-					//STOP
+						//STOP
 					if (gmrae.getReactionEmote().getName().equalsIgnoreCase("\u23F9")) {
 						try {
 							if (gmrae.getGuild().getMember(gmrae.getUser()).hasPermission(Permission.ADMINISTRATOR)
@@ -254,8 +254,9 @@ public class MusicService extends DiscordService {
 							}
 						} catch (Exception e) {
 						}
-					} else if (gmrae.getReaction().getReactionEmote().getEmote().getName()
-							.equalsIgnoreCase("pause_button")) {
+						//PAUSE
+					} else if (gmrae.getReactionEmote().getName()
+							.equalsIgnoreCase("\u23F8")) {
 						try {
 							if (gmrae.getGuild().getMember(gmrae.getUser()).hasPermission(Permission.ADMINISTRATOR)
 									|| gmrae.getReaction().getCount() - 1 >= (double) play.getMembers().size() / 2.0) {
@@ -263,8 +264,9 @@ public class MusicService extends DiscordService {
 							}
 						} catch (Exception e) {
 						}
-					} else if (gmrae.getReaction().getReactionEmote().getEmote().getName()
-							.equalsIgnoreCase("arrow_forward")) {
+						//PLAY
+					} else if (gmrae.getReactionEmote().getName()
+							.equalsIgnoreCase("\u23F5")) {
 						try {
 							if (gmrae.getGuild().getMember(gmrae.getUser()).hasPermission(Permission.ADMINISTRATOR)
 									|| gmrae.getReaction().getCount() - 1 >= (double) play.getMembers().size() / 2.0) {
@@ -272,8 +274,9 @@ public class MusicService extends DiscordService {
 							}
 						} catch (Exception e) {
 						}
+						//SKIP
 					} else if (gmrae.getReaction().getReactionEmote().getEmote().getName()
-							.equalsIgnoreCase("fast_forward")) {
+							.equalsIgnoreCase("\u23E9")) {
 						try {
 							if (gmrae.getGuild().getMember(gmrae.getUser()).hasPermission(Permission.ADMINISTRATOR)
 									|| gmrae.getReaction().getCount() - 1 >= (double) play.getMembers().size() / 2.0) {
