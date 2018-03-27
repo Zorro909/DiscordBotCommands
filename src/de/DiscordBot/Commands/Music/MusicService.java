@@ -149,6 +149,11 @@ public class MusicService extends DiscordService {
 					}
 					return f != null;
 				}
+				
+				@Override
+				public boolean isOpus() {
+					return true;
+				}
 			});
 			play.getGuild().getAudioManager().openAudioConnection(play);
 		}
@@ -240,7 +245,8 @@ public class MusicService extends DiscordService {
 					if (gmrae.getReaction().isSelf()) {
 						return;
 					}
-					if (gmrae.getReactionEmote().getName().equalsIgnoreCase("stop_button")) {
+					//STOP
+					if (gmrae.getReactionEmote().getName().equalsIgnoreCase("\u23F9")) {
 						try {
 							if (gmrae.getGuild().getMember(gmrae.getUser()).hasPermission(Permission.ADMINISTRATOR)
 									|| gmrae.getReaction().getCount() - 1 >= (double) play.getMembers().size() / 2.0) {
