@@ -201,10 +201,10 @@ public class MusicService extends DiscordService {
 		if (at != null) {
 			eb.setAuthor(at.getInfo().author);
 			eb.addField("Playing: " + at.getInfo().title, String.format("%d:%d:%d / %d:%d:%d",
-					TimeUnit.MILLISECONDS.toHours(at.getPosition()), TimeUnit.MILLISECONDS.toMinutes(at.getPosition()),
-					TimeUnit.MILLISECONDS.toSeconds(at.getPosition()), TimeUnit.MILLISECONDS.toHours(at.getDuration()),
-					TimeUnit.MILLISECONDS.toMinutes(at.getDuration()),
-					TimeUnit.MILLISECONDS.toSeconds(at.getDuration())), true);
+					TimeUnit.MILLISECONDS.toHours(at.getPosition()), TimeUnit.MILLISECONDS.toMinutes(at.getPosition())%60,
+					TimeUnit.MILLISECONDS.toSeconds(at.getPosition())%60, TimeUnit.MILLISECONDS.toHours(at.getDuration()),
+					TimeUnit.MILLISECONDS.toMinutes(at.getDuration()%60),
+					TimeUnit.MILLISECONDS.toSeconds(at.getDuration())%60), true);
 		} else {
 			eb.addField("Playing", "Nothing", true);
 		}
@@ -275,7 +275,7 @@ public class MusicService extends DiscordService {
 						} catch (Exception e) {
 						}
 						//SKIP
-					} else if (gmrae.getReaction().getReactionEmote().getEmote().getName()
+					} else if (gmrae.getReactionEmote().getName()
 							.equalsIgnoreCase("\u23E9")) {
 						try {
 							if (gmrae.getGuild().getMember(gmrae.getUser()).hasPermission(Permission.ADMINISTRATOR)
