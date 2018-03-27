@@ -13,3 +13,4 @@ de.DiscordBot.Commands.TranslateCommand
 de.DiscordBot.Commands.UrbanDict
 de.DiscordBot.Commands.Waifu2X
 de.DiscordBot.Commands.WikiBot
+de.DiscordBot.Commands.Music.MusicCommand
