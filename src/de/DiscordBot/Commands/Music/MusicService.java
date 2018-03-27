@@ -256,7 +256,7 @@ public class MusicService extends DiscordService {
 						}
 						//PLAY
 					} else if (gmrae.getReactionEmote().getName()
-							.equalsIgnoreCase("\u23F5")) {
+							.equalsIgnoreCase("⏵")) {
 						try {
 							if (gmrae.getGuild().getMember(gmrae.getUser()).hasPermission(Permission.ADMINISTRATOR)
 									|| gmrae.getReaction().getCount() - 1 >= (double) play.getMembers().size() / 2.0) {
