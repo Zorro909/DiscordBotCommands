@@ -132,13 +132,13 @@ public class MusicService extends DiscordService {
 				public byte[] provide20MsAudio() {
 					return f.data;
 				}
-				
+
 				@Override
 				public boolean canProvide() {
 					f = ap.provide();
 					return f != null;
 				}
-				
+
 				@Override
 				public boolean isOpus() {
 					return true;
@@ -146,14 +146,16 @@ public class MusicService extends DiscordService {
 			});
 			play.getGuild().getAudioManager().openAudioConnection(play);
 		}
-		while ((!queue.isEmpty() || paused || ap.getPlayingTrack()!=null) && !stop) {
-			AudioTrack at = ap.getPlayingTrack();
-			if (at == null) {
-				try {
-					ap.playTrack(queue.take());
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+		while ((!queue.isEmpty() || paused || ap.getPlayingTrack() != null) && !stop) {
+			if (!paused) {
+				AudioTrack at = ap.getPlayingTrack();
+				if (at == null) {
+					try {
+						ap.playTrack(queue.take());
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 			}
 			sendMusicPlayer(paused ? MusicPlayerState.PAUSED : MusicPlayerState.PLAYING);
@@ -189,19 +191,22 @@ public class MusicService extends DiscordService {
 		AudioTrack at = ap.getPlayingTrack();
 		if (at != null) {
 			eb.setAuthor(at.getInfo().author);
-			eb.addField("Playing: " + at.getInfo().title, String.format("%d:%d:%d / %d:%d:%d",
-					TimeUnit.MILLISECONDS.toHours(at.getPosition()), TimeUnit.MILLISECONDS.toMinutes(at.getPosition())%60,
-					TimeUnit.MILLISECONDS.toSeconds(at.getPosition())%60, TimeUnit.MILLISECONDS.toHours(at.getDuration()),
-					TimeUnit.MILLISECONDS.toMinutes(at.getDuration())%60,
-					TimeUnit.MILLISECONDS.toSeconds(at.getDuration())%60), true);
+			eb.addField("Playing: " + at.getInfo().title,
+					String.format("%d:%d:%d / %d:%d:%d", TimeUnit.MILLISECONDS.toHours(at.getPosition()),
+							TimeUnit.MILLISECONDS.toMinutes(at.getPosition()) % 60,
+							TimeUnit.MILLISECONDS.toSeconds(at.getPosition()) % 60,
+							TimeUnit.MILLISECONDS.toHours(at.getDuration()),
+							TimeUnit.MILLISECONDS.toMinutes(at.getDuration()) % 60,
+							TimeUnit.MILLISECONDS.toSeconds(at.getDuration()) % 60),
+					true);
 		} else {
 			eb.addField("Playing", "Nothing", true);
 		}
 		MessageEmbed me = eb.build();
 		boolean edited = false;
 		if (last != null) {
-			if (last.getCreationTime().toLocalDateTime().toEpochSecond(
-					OffsetDateTime.now().getOffset()) < System.currentTimeMillis() - 2 * 60000
+			if (last.getCreationTime().toLocalDateTime()
+					.toEpochSecond(OffsetDateTime.now().getOffset()) < System.currentTimeMillis() - 2 * 60000
 					&& !forceNew) {
 				last.editMessage(me).submit();
 				edited = true;
@@ -217,7 +222,7 @@ public class MusicService extends DiscordService {
 				// Stop
 				last.addReaction("\u23F9").queue();
 				// Play Button
-				last.addReaction(DiscordBot.getBot().getEmotesByName("arrow_forward", true).get(0)).queue();
+				last.addReaction("\u2192").queue();
 				// Skip
 				last.addReaction("\u23E9").queue();
 			} else {
@@ -235,7 +240,7 @@ public class MusicService extends DiscordService {
 						return;
 					}
 					System.out.println(gmrae.getReactionEmote().getName());
-						//STOP
+					// STOP
 					if (gmrae.getReactionEmote().getName().equalsIgnoreCase("\u23F9")) {
 						try {
 							if (gmrae.getGuild().getMember(gmrae.getUser()).hasPermission(Permission.ADMINISTRATOR)
@@ -245,9 +250,8 @@ public class MusicService extends DiscordService {
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
-						//PAUSE
-					} else if (gmrae.getReactionEmote().getName()
-							.equalsIgnoreCase("\u23F8")) {
+						// PAUSE
+					} else if (gmrae.getReactionEmote().getName().equalsIgnoreCase("\u23F8")) {
 						try {
 							if (gmrae.getGuild().getMember(gmrae.getUser()).hasPermission(Permission.ADMINISTRATOR)
 									|| gmrae.getReaction().getCount() - 1 >= (double) play.getMembers().size() / 2.0) {
@@ -256,9 +260,8 @@ public class MusicService extends DiscordService {
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
-						//PLAY
-					} else if (gmrae.getReactionEmote().getName()
-							.equalsIgnoreCase("arrow_forward")) {
+						// PLAY
+					} else if (gmrae.getReactionEmote().getName().equalsIgnoreCase("\u2192")) {
 						try {
 							if (gmrae.getGuild().getMember(gmrae.getUser()).hasPermission(Permission.ADMINISTRATOR)
 									|| gmrae.getReaction().getCount() - 1 >= (double) play.getMembers().size() / 2.0) {
@@ -267,9 +270,8 @@ public class MusicService extends DiscordService {
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
-						//SKIP
-					} else if (gmrae.getReactionEmote().getName()
-							.equalsIgnoreCase("\u23E9")) {
+						// SKIP
+					} else if (gmrae.getReactionEmote().getName().equalsIgnoreCase("\u23E9")) {
 						try {
 							if (gmrae.getGuild().getMember(gmrae.getUser()).hasPermission(Permission.ADMINISTRATOR)
 									|| gmrae.getReaction().getCount() - 1 >= (double) play.getMembers().size() / 2.0) {
