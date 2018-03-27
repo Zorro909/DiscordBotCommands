@@ -3,6 +3,7 @@ package de.DiscordBot.Commands.Music;
 import java.time.ZoneOffset;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -277,48 +278,53 @@ public class MusicService extends DiscordService {
 	}
 
 	public void queueTrack(String search) {
-		dapm.loadItem(search, new AudioLoadResultHandler() {
-			
-			@Override
-			public void trackLoaded(AudioTrack track) {
-				try {
-					queue.put(track);
-					updates.sendMessage("Added the song " + track.getInfo().title).submit();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			
-			@Override
-			public void playlistLoaded(AudioPlaylist playlist) {
-				int tracks = 0;
-				for(AudioTrack at : playlist.getTracks()) {
+		try {
+			dapm.loadItem(search, new AudioLoadResultHandler() {
+				
+				@Override
+				public void trackLoaded(AudioTrack track) {
 					try {
-						queue.put(at);
-						tracks++;
+						queue.put(track);
+						updates.sendMessage("Added the song " + track.getInfo().title).submit();
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
-				updates.sendMessage("Added " + tracks + " songs").submit();
-			}
-			
-			@Override
-			public void noMatches() {
-				updates.sendMessage("Nothing found for search '" + search + "'").submit();
-			}
-			
-			@Override
-			public void loadFailed(FriendlyException exception) {
-				if(exception.severity == Severity.COMMON) {
-					updates.sendMessage("Source for '" + search + "' is probably blocked, please try something else").submit();
-				}else {
-					updates.sendMessage("The Song could not be loaded... Contact @Zorro909#1972").submit();
+				
+				@Override
+				public void playlistLoaded(AudioPlaylist playlist) {
+					int tracks = 0;
+					for(AudioTrack at : playlist.getTracks()) {
+						try {
+							queue.put(at);
+							tracks++;
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+					updates.sendMessage("Added " + tracks + " songs").submit();
 				}
-			}
-		});
+				
+				@Override
+				public void noMatches() {
+					updates.sendMessage("Nothing found for search '" + search + "'").submit();
+				}
+				
+				@Override
+				public void loadFailed(FriendlyException exception) {
+					if(exception.severity == Severity.COMMON) {
+						updates.sendMessage("Source for '" + search + "' is probably blocked, please try something else").submit();
+					}else {
+						updates.sendMessage("The Song could not be loaded... Contact @Zorro909#1972").submit();
+					}
+				}
+			}).get();
+		} catch (InterruptedException | ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }
