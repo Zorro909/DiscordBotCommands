@@ -56,7 +56,7 @@ public class MusicService extends DiscordService {
 	boolean paused = false;
 	long pausedAt = 0;
 	boolean stop = false;
-	
+
 	public MusicService(VoiceChannel toJoin, TextChannel textChannel) {
 		play = toJoin;
 		updates = textChannel;
@@ -140,7 +140,7 @@ public class MusicService extends DiscordService {
 			});
 			play.getGuild().getAudioManager().openAudioConnection(play);
 		}
-		while ((!queue.isEmpty()||paused)&&!stop) {
+		while ((!queue.isEmpty() || paused) && !stop) {
 			AudioTrack at = ap.getPlayingTrack();
 			if (at == null) {
 				try {
@@ -176,7 +176,7 @@ public class MusicService extends DiscordService {
 	protected void sendMusicPlayer(MusicPlayerState state) {
 		sendMusicPlayer(state, false);
 	}
-	
+
 	protected void sendMusicPlayer(MusicPlayerState state, boolean forceNew) {
 		EmbedBuilder eb = new EmbedBuilder();
 		eb.setTitle("Music Player");
@@ -192,11 +192,19 @@ public class MusicService extends DiscordService {
 			eb.addField("Playing", "Nothing", true);
 		}
 		MessageEmbed me = eb.build();
-		if (last!=null&&last.getCreationTime().toLocalDateTime().toEpochSecond(
-				ZoneOffset.of(ZoneOffset.systemDefault().getId())) < System.currentTimeMillis() - 2 * 60000&&!forceNew) {
-			last.editMessage(me).submit();
-		} else {
-			last.delete().submit();
+		boolean edited = false;
+		if (last != null) {
+			if (last.getCreationTime().toLocalDateTime().toEpochSecond(
+					ZoneOffset.of(ZoneOffset.systemDefault().getId())) < System.currentTimeMillis() - 2 * 60000
+					&& !forceNew) {
+				last.editMessage(me).submit();
+				edited = true;
+			}
+		}
+		if (!edited) {
+			if (last != null) {
+				last.delete().submit();
+			}
 			last = updates.sendMessage(me).complete();
 
 			if (state == MusicPlayerState.PAUSED) {
@@ -217,35 +225,46 @@ public class MusicService extends DiscordService {
 			DiscordBot.registerEmoteChangeListener(last, new ListenerAdapter() {
 				@Override
 				public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent gmrae) {
-					if(gmrae.getReaction().isSelf()) {
+					if (gmrae.getReaction().isSelf()) {
 						return;
 					}
-					if(gmrae.getReaction().getReactionEmote().getEmote().getName().equalsIgnoreCase("stop_button")) {
+					if (gmrae.getReaction().getReactionEmote().getEmote().getName().equalsIgnoreCase("stop_button")) {
 						try {
-						if(gmrae.getGuild().getMember(gmrae.getUser()).hasPermission(Permission.ADMINISTRATOR) || gmrae.getReaction().getCount() - 1 >= (double) play.getMembers().size() / 2.0) {
-							stop();
-						}
-						}catch(Exception e) {}
-					}else if(gmrae.getReaction().getReactionEmote().getEmote().getName().equalsIgnoreCase("pause_button")) {
-						try {
-						if(gmrae.getGuild().getMember(gmrae.getUser()).hasPermission(Permission.ADMINISTRATOR) || gmrae.getReaction().getCount() - 1 >= (double) play.getMembers().size() / 2.0) {
-							pause();
-						}
-						}catch(Exception e) {}
-					}else if(gmrae.getReaction().getReactionEmote().getEmote().getName().equalsIgnoreCase("arrow_forward")) {
-						try {
-						if(gmrae.getGuild().getMember(gmrae.getUser()).hasPermission(Permission.ADMINISTRATOR) || gmrae.getReaction().getCount() - 1 >= (double) play.getMembers().size() / 2.0) {
-							unpause();
-						}
-						}catch(Exception e) {}
-					}else if(gmrae.getReaction().getReactionEmote().getEmote().getName().equalsIgnoreCase("fast_forward")) {
-						try {
-						if(gmrae.getGuild().getMember(gmrae.getUser()).hasPermission(Permission.ADMINISTRATOR) || gmrae.getReaction().getCount() - 1 >= (double) play.getMembers().size() / 2.0) {
-							if(!skipTrack()) {
-								updates.sendMessage("Could not skip Track, maybe the queue is empty?").submit();
+							if (gmrae.getGuild().getMember(gmrae.getUser()).hasPermission(Permission.ADMINISTRATOR)
+									|| gmrae.getReaction().getCount() - 1 >= (double) play.getMembers().size() / 2.0) {
+								stop();
 							}
+						} catch (Exception e) {
 						}
-						}catch(Exception e) {}
+					} else if (gmrae.getReaction().getReactionEmote().getEmote().getName()
+							.equalsIgnoreCase("pause_button")) {
+						try {
+							if (gmrae.getGuild().getMember(gmrae.getUser()).hasPermission(Permission.ADMINISTRATOR)
+									|| gmrae.getReaction().getCount() - 1 >= (double) play.getMembers().size() / 2.0) {
+								pause();
+							}
+						} catch (Exception e) {
+						}
+					} else if (gmrae.getReaction().getReactionEmote().getEmote().getName()
+							.equalsIgnoreCase("arrow_forward")) {
+						try {
+							if (gmrae.getGuild().getMember(gmrae.getUser()).hasPermission(Permission.ADMINISTRATOR)
+									|| gmrae.getReaction().getCount() - 1 >= (double) play.getMembers().size() / 2.0) {
+								unpause();
+							}
+						} catch (Exception e) {
+						}
+					} else if (gmrae.getReaction().getReactionEmote().getEmote().getName()
+							.equalsIgnoreCase("fast_forward")) {
+						try {
+							if (gmrae.getGuild().getMember(gmrae.getUser()).hasPermission(Permission.ADMINISTRATOR)
+									|| gmrae.getReaction().getCount() - 1 >= (double) play.getMembers().size() / 2.0) {
+								if (!skipTrack()) {
+									updates.sendMessage("Could not skip Track, maybe the queue is empty?").submit();
+								}
+							}
+						} catch (Exception e) {
+						}
 					}
 				}
 
@@ -260,7 +279,7 @@ public class MusicService extends DiscordService {
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch(Exception e) {
+		} catch (Exception e) {
 			return false;
 		}
 		return false;
@@ -280,7 +299,7 @@ public class MusicService extends DiscordService {
 	public void queueTrack(final String search) {
 		try {
 			dapm.loadItem(search, new AudioLoadResultHandler() {
-				
+
 				@Override
 				public void trackLoaded(AudioTrack track) {
 					try {
@@ -291,15 +310,15 @@ public class MusicService extends DiscordService {
 						e.printStackTrace();
 					}
 				}
-				
+
 				@Override
 				public void playlistLoaded(AudioPlaylist playlist) {
-					if(search.startsWith("ytsearch:")||search.startsWith("scsearch:")) {
+					if (search.startsWith("ytsearch:") || search.startsWith("scsearch:")) {
 						trackLoaded(playlist.getTracks().get(0));
 						return;
 					}
 					int tracks = 0;
-					for(AudioTrack at : playlist.getTracks()) {
+					for (AudioTrack at : playlist.getTracks()) {
 						try {
 							queue.put(at);
 							tracks++;
@@ -310,17 +329,18 @@ public class MusicService extends DiscordService {
 					}
 					updates.sendMessage("Added " + tracks + " songs").submit();
 				}
-				
+
 				@Override
 				public void noMatches() {
 					updates.sendMessage("Nothing found for search '" + search + "'").submit();
 				}
-				
+
 				@Override
 				public void loadFailed(FriendlyException exception) {
-					if(exception.severity == Severity.COMMON) {
-						updates.sendMessage("Source for '" + search + "' is probably blocked, please try something else").submit();
-					}else {
+					if (exception.severity == Severity.COMMON) {
+						updates.sendMessage(
+								"Source for '" + search + "' is probably blocked, please try something else").submit();
+					} else {
 						updates.sendMessage("The Song could not be loaded... Contact @Zorro909#1972").submit();
 					}
 				}
