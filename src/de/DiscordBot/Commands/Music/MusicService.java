@@ -144,7 +144,7 @@ public class MusicService extends DiscordService {
 					}else {
 						good++;
 					}
-					if(bad+good%10000==0) {
+					if(bad+good%10==0) {
 						System.out.println(((double)bad) / ((double)(bad+good)) + "% bad");
 					}
 					return f != null;
@@ -240,7 +240,7 @@ public class MusicService extends DiscordService {
 					if (gmrae.getReaction().isSelf()) {
 						return;
 					}
-					if (gmrae.getReaction().getReactionEmote().getEmote().getName().equalsIgnoreCase("stop_button")) {
+					if (gmrae.getReactionEmote().getName().equalsIgnoreCase("stop_button")) {
 						try {
 							if (gmrae.getGuild().getMember(gmrae.getUser()).hasPermission(Permission.ADMINISTRATOR)
 									|| gmrae.getReaction().getCount() - 1 >= (double) play.getMembers().size() / 2.0) {
