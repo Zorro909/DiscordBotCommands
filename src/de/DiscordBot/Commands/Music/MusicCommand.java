@@ -59,6 +59,9 @@ public class MusicCommand extends DiscordCommand {
 			MusicService ms = new MusicService(toJoin, m.getTextChannel());
 			ms.queueTrack(search);
 			DiscordBot.startService(ms);
+			guildMusic.put(m.getGuild().getId(), ms);
+		}else {
+			guildMusic.get(m.getGuild().getId()).queueTrack(search);
 		}
 		
 		return null;
