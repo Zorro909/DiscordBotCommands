@@ -300,6 +300,7 @@ public class MusicService extends DiscordService {
 		ap.stopTrack();
 		play.getGuild().getAudioManager().closeAudioConnection();
 		stop = true;
+		MusicCommand.guildMusic.remove(play.getGuild().getId());
 	}
 
 	@Override

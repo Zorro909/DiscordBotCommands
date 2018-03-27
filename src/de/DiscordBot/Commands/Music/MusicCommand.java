@@ -17,7 +17,7 @@ import net.dv8tion.jda.core.entities.VoiceChannel;
 
 public class MusicCommand extends DiscordCommand {
 
-	public HashMap<String, MusicService> guildMusic = new HashMap<String, MusicService>();
+	public static HashMap<String, MusicService> guildMusic = new HashMap<String, MusicService>();
 
 	public MusicCommand() {
 		super("play", new String[] { "yt", "scloud" }, "Plays music in your current channel",
