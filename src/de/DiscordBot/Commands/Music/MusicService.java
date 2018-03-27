@@ -15,6 +15,7 @@ import com.sedmelluq.discord.lavaplayer.player.event.AudioEvent;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventListener;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
+import com.sedmelluq.discord.lavaplayer.source.http.HttpAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
@@ -28,6 +29,11 @@ import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrame;
 import de.DiscordBot.DiscordBot;
 import de.DiscordBot.Commands.DiscordService;
 import javautils.UtilHelpers.Cleanable;
+import lavalink.client.io.Link;
+import lavalink.client.player.IPlayer;
+import lavalink.client.player.event.IPlayerEventListener;
+import lavalink.client.player.event.PlayerEvent;
+import lavalink.client.player.event.PlayerEventListenerAdapter;
 import net.dv8tion.jda.client.managers.EmoteManager;
 import net.dv8tion.jda.client.managers.EmoteManagerUpdatable;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -42,6 +48,7 @@ import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.VoiceChannel;
+import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionRemoveEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
@@ -52,44 +59,48 @@ public class MusicService extends DiscordService {
 	VoiceChannel play;
 	TextChannel updates;
 	LinkedBlockingQueue<AudioTrack> queue = new LinkedBlockingQueue<AudioTrack>();
-	DefaultAudioPlayerManager dapm;
-	AudioPlayer ap;
 	boolean paused = false;
 	long pausedAt = 0;
 	boolean stop = false;
-
+	Link l;
+	IPlayer ap;
+	DefaultAudioPlayerManager dapm;
+	
 	public MusicService(VoiceChannel toJoin, TextChannel textChannel) {
+		l = MusicCommand.ll.getLink(toJoin.getGuild());
 		play = toJoin;
 		updates = textChannel;
+		l.connect(play);
+		ap = l.getPlayer();
+		MusicCommand.ll.onReady(new ReadyEvent(DiscordBot.getBot(), 0));
 		dapm = new DefaultAudioPlayerManager();
-		ap = dapm.createPlayer();
 		dapm.registerSourceManager(new YoutubeAudioSourceManager(true));
 		dapm.registerSourceManager(new SoundCloudAudioSourceManager(true));
-		dapm.registerSourceManager(new com.sedmelluq.discord.lavaplayer.source.http.HttpAudioSourceManager());
+		dapm.registerSourceManager(new HttpAudioSourceManager());
 	}
 
 	@Override
 	public void run() {
 		if (!queue.isEmpty()) {
-			ap.addListener(new AudioEventAdapter() {
+			ap.addListener(new PlayerEventListenerAdapter() {
 
 				@Override
-				public void onPlayerPause(AudioPlayer player) {
+				public void onPlayerPause(IPlayer player) {
 					sendMusicPlayer(MusicPlayerState.PAUSED, true);
 				}
 
 				@Override
-				public void onPlayerResume(AudioPlayer player) {
+				public void onPlayerResume(IPlayer player) {
 					sendMusicPlayer(MusicPlayerState.PLAYING, true);
 				}
 
 				@Override
-				public void onTrackStart(AudioPlayer player, AudioTrack track) {
+				public void onTrackStart(IPlayer player, AudioTrack track) {
 					sendMusicPlayer(MusicPlayerState.PLAYING, true);
 				}
 
 				@Override
-				public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
+				public void onTrackEnd(IPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
 					if (endReason == AudioTrackEndReason.LOAD_FAILED) {
 						updates.sendMessage(new MessageBuilder()
 								.append("Track " + track.getInfo().title + " couldn't be loaded... Skipping").build());
@@ -110,7 +121,7 @@ public class MusicService extends DiscordService {
 				}
 
 				@Override
-				public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
+				public void onTrackStuck(IPlayer player, AudioTrack track, long thresholdMs) {
 					updates.sendMessage(new MessageBuilder()
 							.append("Track " + track.getInfo().title + " got stuck... Skipping").build());
 					if (queue.isEmpty()) {
@@ -123,25 +134,6 @@ public class MusicService extends DiscordService {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-				}
-			});
-			play.getGuild().getAudioManager().setSendingHandler(new AudioSendHandler() {
-				AudioFrame f;
-
-				@Override
-				public byte[] provide20MsAudio() {
-					return f.data;
-				}
-
-				@Override
-				public boolean canProvide() {
-					f = ap.provide();
-					return f != null;
-				}
-
-				@Override
-				public boolean isOpus() {
-					return true;
 				}
 			});
 			play.getGuild().getAudioManager().openAudioConnection(play);
@@ -306,9 +298,12 @@ public class MusicService extends DiscordService {
 	}
 
 	protected void stop() {
+		try {
 		if(ap.getPlayingTrack()!=null)ap.stopTrack();
 		ap.playTrack(null);
-		play.getGuild().getAudioManager().closeAudioConnection();
+		}catch(Exception e) {}
+		l.disconnect();
+		
 		stop = true;
 		MusicCommand.guildMusic.remove(play.getGuild().getId());
 	}

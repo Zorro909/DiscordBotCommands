@@ -1,5 +1,7 @@
 package de.DiscordBot.Commands.Music;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 
@@ -7,6 +9,7 @@ import de.DiscordBot.DiscordBot;
 import de.DiscordBot.Commands.DiscordCommand;
 import de.DiscordBot.Config.Config;
 import de.DiscordBot.Config.ConfigPage;
+import lavalink.client.io.Lavalink;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.Guild;
@@ -18,11 +21,19 @@ import net.dv8tion.jda.core.entities.VoiceChannel;
 public class MusicCommand extends DiscordCommand {
 
 	public static HashMap<String, MusicService> guildMusic = new HashMap<String, MusicService>();
-
+	public static Lavalink ll;
+	
 	public MusicCommand() {
 		super("play", new String[] { "yt", "scloud" }, "Plays music in your current channel",
 				"\n\\play [URL]\n\\yt [search|URL]\n\\scloud");
-		// TODO Auto-generated constructor stub
+		ll = new Lavalink(DiscordBot.getBot().getSelfUser().getId(), 1, (i) -> {return DiscordBot.getBot();});
+		try {
+			ll.addNode(new URI("ws://dev.jectrum.de:18954"), "DVaeBSsWuZ303");
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		DiscordBot.getBot().addEventListener(ll);
 	}
 
 	@Override

@@ -77,8 +77,24 @@
 			<name>bintray</name>
 			<url>http://jcenter.bintray.com</url>
 		</repository>
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository>
 	</repositories>
 	<dependencies>
+		<dependency>
+			<groupId>com.github.Frederikam</groupId>
+			<artifactId>Lavalink</artifactId>
+			<version>1bfb2276dd</version>
+			<exclusions>
+				<exclusion>
+					<!-- Exclude the server module -->
+					<groupId>com.github.Frederikam.Lavalink</groupId>
+					<artifactId>Lavalink-Server</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 		<dependency>
 			<groupId>DiscordBot</groupId>
 			<artifactId>DiscordBot</artifactId>
