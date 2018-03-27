@@ -192,7 +192,7 @@ public class MusicService extends DiscordService {
 			eb.addField("Playing: " + at.getInfo().title, String.format("%d:%d:%d / %d:%d:%d",
 					TimeUnit.MILLISECONDS.toHours(at.getPosition()), TimeUnit.MILLISECONDS.toMinutes(at.getPosition())%60,
 					TimeUnit.MILLISECONDS.toSeconds(at.getPosition())%60, TimeUnit.MILLISECONDS.toHours(at.getDuration()),
-					TimeUnit.MILLISECONDS.toMinutes(at.getDuration()%60),
+					TimeUnit.MILLISECONDS.toMinutes(at.getDuration())%60,
 					TimeUnit.MILLISECONDS.toSeconds(at.getDuration())%60), true);
 		} else {
 			eb.addField("Playing", "Nothing", true);
