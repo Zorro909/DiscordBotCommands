@@ -1,5 +1,6 @@
 package de.DiscordBot.Commands.Music;
 
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.LinkedList;
 import java.util.List;
@@ -195,7 +196,7 @@ public class MusicService extends DiscordService {
 		boolean edited = false;
 		if (last != null) {
 			if (last.getCreationTime().toLocalDateTime().toEpochSecond(
-					ZoneOffset.of(ZoneOffset.systemDefault().getId())) < System.currentTimeMillis() - 2 * 60000
+					OffsetDateTime.now().getOffset()) < System.currentTimeMillis() - 2 * 60000
 					&& !forceNew) {
 				last.editMessage(me).submit();
 				edited = true;
