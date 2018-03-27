@@ -291,6 +291,9 @@ public class MusicService extends DiscordService {
 
 	protected boolean skipTrack() {
 		try {
+			if(queue.isEmpty()) {
+				return false;
+			}
 			ap.playTrack(queue.take());
 			return true;
 		} catch (InterruptedException e) {
@@ -303,7 +306,7 @@ public class MusicService extends DiscordService {
 	}
 
 	protected void stop() {
-		ap.stopTrack();
+		if(ap.getPlayingTrack()!=null)ap.stopTrack();
 		play.getGuild().getAudioManager().closeAudioConnection();
 		stop = true;
 		MusicCommand.guildMusic.remove(play.getGuild().getId());
