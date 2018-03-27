@@ -63,7 +63,7 @@ public class MusicCommand extends DiscordCommand {
 		}else {
 			guildMusic.get(m.getGuild().getId()).queueTrack(search);
 		}
-		
+		m.delete().submit();
 		return null;
 	}
 

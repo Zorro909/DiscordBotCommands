@@ -215,18 +215,18 @@ public class MusicService extends DiscordService {
 
 			if (state == MusicPlayerState.PAUSED) {
 				// Stop
-				last.addReaction("\u23F9").complete();
+				last.addReaction("\u23F9").queue();
 				// Play Button
-				last.addReaction("\u23F5").complete();
+				last.addReaction("\u23F5").queue();
 				// Skip
-				last.addReaction("\u23E9").complete();
+				last.addReaction("\u23E9").queue();
 			} else {
 				// Pause
-				last.addReaction("\u23F8").complete();
+				last.addReaction("\u23F8").queue();
 				// Stop
-				last.addReaction("\u23F9").complete();
+				last.addReaction("\u23F9").queue();
 				// Skip
-				last.addReaction("\u23E9").complete();
+				last.addReaction("\u23E9").queue();
 			}
 			DiscordBot.registerEmoteChangeListener(last, new ListenerAdapter() {
 				@Override
@@ -279,7 +279,7 @@ public class MusicService extends DiscordService {
 					}
 				}
 
-			}, 4 * 60 * 1000);
+			}, 5 * 60 * 1000);
 		}
 	}
 
