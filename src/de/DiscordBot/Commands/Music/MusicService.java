@@ -217,7 +217,7 @@ public class MusicService extends DiscordService {
 				// Stop
 				last.addReaction("\u23F9").queue();
 				// Play Button
-				last.addReaction("\u23F5").queue();
+				last.addReaction("⏵").queue();
 				// Skip
 				last.addReaction("\u23E9").queue();
 			} else {
