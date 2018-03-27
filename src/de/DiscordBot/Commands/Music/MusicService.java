@@ -133,9 +133,20 @@ public class MusicService extends DiscordService {
 					return f.data;
 				}
 
+				int good = 0;
+				int bad = 0;
+				
 				@Override
 				public boolean canProvide() {
 					f = ap.provide();
+					if(f==null) {
+						bad++;
+					}else {
+						good++;
+					}
+					if(bad+good%10000==0) {
+						System.out.println(((double)bad) / ((double)(bad+good)) + "% bad");
+					}
 					return f != null;
 				}
 			});
