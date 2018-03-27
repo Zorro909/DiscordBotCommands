@@ -192,7 +192,7 @@ public class MusicService extends DiscordService {
 			eb.addField("Playing", "Nothing", true);
 		}
 		MessageEmbed me = eb.build();
-		if (last.getCreationTime().toLocalDateTime().toEpochSecond(
+		if (last!=null&&last.getCreationTime().toLocalDateTime().toEpochSecond(
 				ZoneOffset.of(ZoneOffset.systemDefault().getId())) < System.currentTimeMillis() - 2 * 60000&&!forceNew) {
 			last.editMessage(me).submit();
 		} else {
