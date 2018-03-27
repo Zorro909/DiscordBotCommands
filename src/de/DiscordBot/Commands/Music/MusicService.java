@@ -222,7 +222,7 @@ public class MusicService extends DiscordService {
 				// Stop
 				last.addReaction("\u23F9").queue();
 				// Play Button
-				last.addReaction("\u2192").queue();
+				last.addReaction("\u25B6").queue();
 				// Skip
 				last.addReaction("\u23E9").queue();
 			} else {
@@ -261,7 +261,7 @@ public class MusicService extends DiscordService {
 							e.printStackTrace();
 						}
 						// PLAY
-					} else if (gmrae.getReactionEmote().getName().equalsIgnoreCase("\u2192")) {
+					} else if (gmrae.getReactionEmote().getName().equalsIgnoreCase("\u25B6")) {
 						try {
 							if (gmrae.getGuild().getMember(gmrae.getUser()).hasPermission(Permission.ADMINISTRATOR)
 									|| gmrae.getReaction().getCount() - 1 >= (double) play.getMembers().size() / 2.0) {
