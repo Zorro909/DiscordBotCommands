@@ -146,7 +146,7 @@ public class MusicService extends DiscordService {
 			});
 			play.getGuild().getAudioManager().openAudioConnection(play);
 		}
-		while ((!queue.isEmpty() || paused) && !stop) {
+		while ((!queue.isEmpty() || paused || ap.getPlayingTrack()!=null) && !stop) {
 			AudioTrack at = ap.getPlayingTrack();
 			if (at == null) {
 				try {
@@ -243,6 +243,7 @@ public class MusicService extends DiscordService {
 								stop();
 							}
 						} catch (Exception e) {
+							e.printStackTrace();
 						}
 						//PAUSE
 					} else if (gmrae.getReactionEmote().getName()
@@ -253,6 +254,7 @@ public class MusicService extends DiscordService {
 								pause();
 							}
 						} catch (Exception e) {
+							e.printStackTrace();
 						}
 						//PLAY
 					} else if (gmrae.getReactionEmote().getName()
@@ -263,6 +265,7 @@ public class MusicService extends DiscordService {
 								unpause();
 							}
 						} catch (Exception e) {
+							e.printStackTrace();
 						}
 						//SKIP
 					} else if (gmrae.getReactionEmote().getName()
@@ -275,6 +278,7 @@ public class MusicService extends DiscordService {
 								}
 							}
 						} catch (Exception e) {
+							e.printStackTrace();
 						}
 					}
 				}
