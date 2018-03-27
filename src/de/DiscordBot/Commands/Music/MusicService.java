@@ -217,7 +217,7 @@ public class MusicService extends DiscordService {
 				// Stop
 				last.addReaction("\u23F9").queue();
 				// Play Button
-				last.addReaction("⏵").queue();
+				last.addReaction(DiscordBot.getBot().getEmotesByName("arrow_forward", true).get(0)).queue();
 				// Skip
 				last.addReaction("\u23E9").queue();
 			} else {
@@ -256,7 +256,7 @@ public class MusicService extends DiscordService {
 						}
 						//PLAY
 					} else if (gmrae.getReactionEmote().getName()
-							.equalsIgnoreCase("⏵")) {
+							.equalsIgnoreCase("arrow_forward")) {
 						try {
 							if (gmrae.getGuild().getMember(gmrae.getUser()).hasPermission(Permission.ADMINISTRATOR)
 									|| gmrae.getReaction().getCount() - 1 >= (double) play.getMembers().size() / 2.0) {
