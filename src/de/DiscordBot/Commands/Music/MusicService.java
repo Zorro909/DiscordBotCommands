@@ -277,7 +277,7 @@ public class MusicService extends DiscordService {
 		stop();
 	}
 
-	public void queueTrack(String search) {
+	public void queueTrack(final String search) {
 		try {
 			dapm.loadItem(search, new AudioLoadResultHandler() {
 				
@@ -294,6 +294,10 @@ public class MusicService extends DiscordService {
 				
 				@Override
 				public void playlistLoaded(AudioPlaylist playlist) {
+					if(search.startsWith("ytsearch:")||search.startsWith("scsearch:")) {
+						trackLoaded(playlist.getTracks().get(0));
+						return;
+					}
 					int tracks = 0;
 					for(AudioTrack at : playlist.getTracks()) {
 						try {
