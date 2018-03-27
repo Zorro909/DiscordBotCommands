@@ -132,21 +132,10 @@ public class MusicService extends DiscordService {
 				public byte[] provide20MsAudio() {
 					return f.data;
 				}
-
-				int good = 0;
-				int bad = 0;
 				
 				@Override
 				public boolean canProvide() {
 					f = ap.provide();
-					if(f==null) {
-						bad++;
-					}else {
-						good++;
-					}
-					if(bad+good%10==0) {
-						System.out.println(((double)bad) / ((double)(bad+good)) + "% bad");
-					}
 					return f != null;
 				}
 				
@@ -245,6 +234,7 @@ public class MusicService extends DiscordService {
 					if (gmrae.getReaction().isSelf()) {
 						return;
 					}
+					System.out.println(gmrae.getReactionEmote().getName());
 						//STOP
 					if (gmrae.getReactionEmote().getName().equalsIgnoreCase("\u23F9")) {
 						try {
