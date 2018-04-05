@@ -1,0 +1,80 @@
+package de.DiscordBot.Commands.Markov;
+
+import de.DiscordBot.CommandExecutor;
+import de.DiscordBot.DiscordBot;
+import de.DiscordBot.ChatLog.ChatLog;
+import de.DiscordBot.ChatLog.ChatLogChannel;
+import de.DiscordBot.ChatLog.ChatLogMessage;
+import de.DiscordBot.Commands.DiscordService;
+import net.dv8tion.jda.core.entities.ChannelType;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.core.hooks.ListenerAdapter;
+
+public class MarkovService extends DiscordService {
+
+	Markov global;
+	ListenerAdapter listener;
+	private static MarkovService service;
+	
+	@Override
+	public void run() {
+		global = new Markov();
+		ChatLog cl = CommandExecutor.getChatLog();
+		for(Guild g : DiscordBot.getBot().getGuilds()) {
+			for(ChatLogChannel clc : cl.listChannels(g).values()) {
+				clc.load();
+				for(ChatLogMessage clm : clc.clm) {
+					String content = clm.content;
+					if(content.startsWith("!")||content.startsWith("t!")||content.startsWith("~")||content.startsWith("\\")||content.startsWith("/")||content.startsWith("-")) {
+						continue;
+					}
+					global.addWords(content);
+				}
+			}
+		}
+		
+		DiscordBot.getBot().addEventListener((listener=new ListenerAdapter() {
+			@Override
+			public void onMessageReceived(MessageReceivedEvent event) {
+				if(event.getChannelType()==ChannelType.TEXT) {
+					if(!event.getAuthor().isBot()) {
+						Message m = event.getMessage();
+						String content = m.getContent();
+						if(!content.isEmpty()) {
+							if(content.startsWith("!")||content.startsWith("t!")||content.startsWith("~")||content.startsWith("\\")||content.startsWith("/")||content.startsWith("-")) {
+								return;
+							}
+							global.addWords(content);
+						}
+					}
+				}
+			}			
+		}));
+	}
+
+	public static String generateSentence(String seed) {
+		if(service == null) {
+			service = new MarkovService();
+			DiscordBot.startService(service);
+		}
+		return service.global.generateSentence(seed);
+	}
+	
+	public static String generateSentence() {
+		if(service == null) {
+			service = new MarkovService();
+			DiscordBot.startService(service);
+		}
+		return service.global.generateSentence();
+	}
+	
+	@Override
+	public void shutdown() {
+		service = null;
+		DiscordBot.getBot().removeEventListener(listener);
+		global = null;
+	}
+
+}

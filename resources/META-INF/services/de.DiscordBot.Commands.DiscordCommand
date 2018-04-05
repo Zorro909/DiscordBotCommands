@@ -14,3 +14,4 @@ de.DiscordBot.Commands.UrbanDict
 de.DiscordBot.Commands.Waifu2X
 de.DiscordBot.Commands.WikiBot
 de.DiscordBot.Commands.Music.MusicCommand
+de.DiscordBot.Commands.Markov.MarkovCommand
