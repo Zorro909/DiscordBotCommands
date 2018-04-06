@@ -7,6 +7,7 @@ import de.DiscordBot.Config.Config;
 import de.DiscordBot.Config.ConfigPage;
 import net.dv8tion.jda.client.managers.EmoteManager;
 import net.dv8tion.jda.core.MessageBuilder;
+import net.dv8tion.jda.core.entities.Emote;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
@@ -65,26 +66,28 @@ public class TicTacToeCommand extends DiscordCommand implements EventListener {
 						}
 					}
 				}
-			},2*60*1000);
+			}, 2 * 60 * 1000);
 			new Thread(new Runnable() {
 
 				@Override
 				public void run() {
 					try {
-						Thread.sleep(2*60*1000);
+						Thread.sleep(2 * 60 * 1000);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					if(!g.accepted) {
-						if(state.containsKey(m.getChannel())) {
+					if (!g.accepted) {
+						if (state.containsKey(m.getChannel())) {
 							state.remove(m.getChannel());
 							m.getChannel().getMessageById(g.lastId).complete().delete().queue();
-							m.getChannel().sendMessage(m.getAuthor().getAsMention() + " Sorry but your Request was ignored... :cry:").queue();
+							m.getChannel().sendMessage(
+									m.getAuthor().getAsMention() + " Sorry but your Request was ignored... :cry:")
+									.queue();
 						}
 					}
 				}
-				
+
 			}).start();
 			state.put(m.getChannel(), g);
 			return "";
@@ -95,8 +98,11 @@ public class TicTacToeCommand extends DiscordCommand implements EventListener {
 		MessageBuilder msg = new MessageBuilder();
 
 		msg.append("Tic Tac Toe\n");
-		msg.append(g.players[0].getNickname() + " vs " + g.players[1].getNickname() + "\n");
+		msg.append((g.lastPlayer == 1 ? "__***" : "") + g.players[0].getNickname() + (g.lastPlayer == 1 ? "__***" : "")
+				+ " vs " + (g.lastPlayer == 0 ? "__***" : "") + g.players[1].getNickname()
+				+ (g.lastPlayer == 0 ? "__***" : "") + "\n");
 		msg.append("To select a tile, write it's number in the chat\n");
+		msg.append("You can also change your Emote by adding it behind the number");
 		int i = 1;
 		for (String[] row : g.board) {
 			for (String column : row) {
@@ -181,41 +187,58 @@ public class TicTacToeCommand extends DiscordCommand implements EventListener {
 		String[] emojis = new String[] { "\u2716", "\u2B55" };
 		int lastPlayer;
 		boolean accepted = false;
+		int round = 0;
 	}
 
 	@Override
 	public void onEvent(Event event) {
 		if (event instanceof MessageReceivedEvent) {
 			MessageReceivedEvent mre = (MessageReceivedEvent) event;
-			if (mre.getMessage().getContent().length() == 1) {
-				if (state.containsKey(mre.getChannel())) {
-					Game g = state.get(mre.getChannel());
-					if (g.accepted) {
-						int cPlayer = 0;
-						if (g.lastPlayer == 0) {
-							cPlayer = 1;
+			if (state.containsKey(mre.getChannel())) {
+				Game g = state.get(mre.getChannel());
+				if (g.accepted) {
+					int cPlayer = 0;
+					if (g.lastPlayer == 0) {
+						cPlayer = 1;
+					}
+					if (g.players[cPlayer].getUser().getId().equals(mre.getAuthor().getId())) {
+						if(g.round<2&&mre.getMessage().getEmotes().size()>0) {
+							Emote e = mre.getMessage().getEmotes().get(0);
+							if(e.isFake()) {
+								mre.getChannel().sendMessage("I can't use the emote " + e.getName() + "... :cry:").queue();
+							}else {
+								g.emojis[cPlayer] = e.getId();
+							}
+						}else if(g.round<2) {
+							if(mre.getMessage().getRawContent().length()>1) {
+								String emoji = mre.getMessage().getRawContent().substring(1);
+								if(emoji.length()<3) {
+									g.emojis[cPlayer] = emoji;
+								}else {
+									mre.getChannel().sendMessage("Your 'Emoji' is probably none... :angry:").queue();
+								}
+							}
 						}
-						if (g.players[cPlayer].getUser().getId().equals(mre.getAuthor().getId())) {
-							int l = 0;
-							try {
-								l = Integer.parseInt(mre.getMessage().getContent()) - 1;
-							} catch (Exception e) {
-								return;
-							}
-							if (l > 8 || l < 0) {
-								mre.getChannel().sendMessage("The tiles are numbered 1 through 9!").queue();
-								return;
-							}
-							if (g.board[Math.round(l / 3)][l % 3] != null) {
-								mre.getChannel().sendMessage("The tile " + (l + 1) + " was already chosen!");
-								return;
-							}
-							mre.getChannel().getMessageById(g.lastId).complete().delete().queue();
-							g.board[Math.round(l / 3)][l % 3] = g.emojis[cPlayer];
-							g.lastPlayer = cPlayer;
-							sendBoard(g);
-							mre.getMessage().delete().queue();
+						int l = 0;
+						try {
+							l = Integer.parseInt(mre.getMessage().getRawContent().substring(0, 1)) - 1;
+						} catch (Exception e) {
+							return;
 						}
+						if (l > 8 || l < 0) {
+							mre.getChannel().sendMessage("The tiles are numbered 1 through 9!").queue();
+							return;
+						}
+						if (g.board[Math.round(l / 3)][l % 3] != null) {
+							mre.getChannel().sendMessage("The tile " + (l + 1) + " was already chosen!");
+							return;
+						}
+						mre.getChannel().getMessageById(g.lastId).complete().delete().queue();
+						g.board[Math.round(l / 3)][l % 3] = g.emojis[cPlayer];
+						g.lastPlayer = cPlayer;
+						sendBoard(g);
+						mre.getMessage().delete().queue();
+						g.round++;
 					}
 				}
 			}
