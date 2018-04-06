@@ -5,6 +5,7 @@ import java.util.HashMap;
 import de.DiscordBot.DiscordBot;
 import de.DiscordBot.Config.Config;
 import de.DiscordBot.Config.ConfigPage;
+import net.dv8tion.jda.client.managers.EmoteManager;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
@@ -42,14 +43,14 @@ public class TicTacToeCommand extends DiscordCommand implements EventListener {
 					.build();
 			Message msg = m.getChannel().sendMessage(ms).complete();
 			g.lastId = msg.getId();
-			msg.addReaction("\u1F44D").complete();
-			msg.addReaction("\u1F44E").complete();
+			msg.addReaction("👍").complete();
+			msg.addReaction("👎").complete();
 			DiscordBot.registerEmoteChangeListener(msg, new ListenerAdapter() {
 				@Override
 				public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent gmrae) {
 					if (g.accepted = true)
 						return;
-					if (gmrae.getMember().getUser().getId().equals(g.players[1])) {
+					if (gmrae.getMember().getUser().getId().equals(g.players[1].getUser().getId())) {
 						if (gmrae.getReactionEmote().getName().equals("\u1F44D")) {
 							g.accepted = true;
 							sendBoard(g);
