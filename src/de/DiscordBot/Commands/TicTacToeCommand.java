@@ -147,6 +147,7 @@ public class TicTacToeCommand extends DiscordCommand implements EventListener {
 				}
 				if (i == 2) {
 					msg.append("Nobody won... It's a tie :cry:");
+					state.remove(g.channel);
 				}
 			}
 		}
@@ -213,6 +214,7 @@ public class TicTacToeCommand extends DiscordCommand implements EventListener {
 							g.board[Math.round(l / 3)][l % 3] = g.emojis[cPlayer];
 							g.lastPlayer = cPlayer;
 							sendBoard(g);
+							mre.getMessage().delete().queue();
 						}
 					}
 				}
