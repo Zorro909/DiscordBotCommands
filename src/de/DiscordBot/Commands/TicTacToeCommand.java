@@ -48,7 +48,7 @@ public class TicTacToeCommand extends DiscordCommand implements EventListener {
 			DiscordBot.registerEmoteChangeListener(msg, new ListenerAdapter() {
 				@Override
 				public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent gmrae) {
-					if (g.accepted = true)
+					if (g.accepted == true)
 						return;
 					if (gmrae.getMember().getUser().getId().equals(g.players[1].getUser().getId())) {
 						if (gmrae.getReactionEmote().getName().equals("\u1F44D")) {
