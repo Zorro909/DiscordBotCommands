@@ -220,12 +220,7 @@ public class TicTacToeCommand extends DiscordCommand implements EventListener {
 							} else if (g.round < 2) {
 								if (mre.getMessage().getRawContent().length() > 1) {
 									String emoji = mre.getMessage().getRawContent().substring(1).trim();
-									if (emoji.startsWith("<")) {
-										g.emojis[cPlayer] = emoji;
-									} else {
-										mre.getChannel().sendMessage("Your 'Emoji' is probably none... :angry:")
-												.queue();
-									}
+									g.emojis[cPlayer] = emoji;
 								}
 							}
 
