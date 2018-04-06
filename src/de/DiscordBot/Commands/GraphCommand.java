@@ -55,7 +55,7 @@ public class GraphCommand extends DiscordCommand {
 
 	private String join(String[] args, int i) {
 		String s = "";
-		for (i = i; i < args.length; i++) {
+		for (; i < args.length; i++) {
 			s += args[i] + " ";
 		}
 		return s;

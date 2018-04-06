@@ -77,7 +77,7 @@ public class DeviantArtSearch extends DiscordCommand {
       int size = response.getResults().length;
       System.out.println("Found " + size + " results for " + search);
       if(size<1) {
-        return new Integer(0);
+        return 0;
       }
       int rand = random.nextInt(size);
       File cache = new File("DeviantCache.png");

@@ -1,7 +1,5 @@
 package de.DiscordBot.Commands.Markov;
 
-import java.lang.reflect.Array;
-
 import de.DiscordBot.Commands.DiscordCommand;
 import de.DiscordBot.Config.Config;
 import de.DiscordBot.Config.ConfigPage;
@@ -23,6 +21,9 @@ public class MarkovCommand extends DiscordCommand {
 			msg = MarkovService.generateSentence(String.join(" ", args));
 		}else {
 			msg = MarkovService.generateSentence();
+		}
+		if(msg.length()>1800) {
+			msg = msg.substring(0, 1800) + "...";
 		}
 		return new EmbedBuilder().addField("Text", msg, true).setAuthor("Alia").build();
 	}

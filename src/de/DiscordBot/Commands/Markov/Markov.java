@@ -22,7 +22,8 @@ public class Markov {
 	 * Add words
 	 */
 	public void addWords(String phrase) {
-		if(phrase.isEmpty())return;
+		if (phrase.isEmpty())
+			return;
 		// put each word into an array
 		String[] words = phrase.split(" ");
 
@@ -37,14 +38,24 @@ public class Markov {
 			if (i == 0) {
 				Vector<String> startWords = markovChain.get("_start");
 				startWords.add(words[i]);
-
+				
+				if(words.length==1) {
+					Vector<String> endWords = markovChain.get("_end");
+					endWords.add(words[i]);
+				}
+				
 				Vector<String> suffix = markovChain.get(words[i]);
 				if (suffix == null) {
-					suffix = new Vector<String>();
-					suffix.add(words[i + 1]);
-					markovChain.put(words[i], suffix);
+					if (words.length > i + 1) {
+						suffix = new Vector<String>();
+						suffix.add(words[i + 1]);
+						markovChain.put(words[i], suffix);
+					} else {
+						Vector<String> endWords = markovChain.get("_end");
+						endWords.add(words[i]);
+					}
 				}
-
+				
 			} else if (i == words.length - 1) {
 				Vector<String> endWords = markovChain.get("_end");
 				endWords.add(words[i]);
@@ -66,7 +77,7 @@ public class Markov {
 	public String generateSentence() {
 		return generateSentence(null);
 	}
-	
+
 	/*
 	 * Generate a markov phrase
 	 */
@@ -78,32 +89,51 @@ public class Markov {
 		// String for the next word
 		String nextWord = "";
 
-		if(seed==null) {
-		// Select the first word
-		Vector<String> startWords = markovChain.get("_start");
-		int startWordsLen = startWords.size();
-		nextWord = startWords.get(rnd.nextInt(startWordsLen));
-		}else {
-			if(seed.trim().contains(" ")) {
-				for(String s : seed.trim().split(" ")) {
-					if(!nextWord.isEmpty()) {
-						newPhrase.add(s);
+		if (seed == null) {
+			// Select the first word
+			Vector<String> startWords = markovChain.get("_start");
+			int startWordsLen = startWords.size();
+			nextWord = startWords.get(rnd.nextInt(startWordsLen));
+		} else {
+			if (seed.trim().contains(" ")) {
+				for (String s : seed.trim().split(" ")) {
+					if (!nextWord.isEmpty()) {
+						newPhrase.add(nextWord);
 					}
 					nextWord = s;
 				}
-			}else {
+			} else {
 				nextWord = seed;
 			}
 		}
 		newPhrase.add(nextWord);
 
+		Vector<String> end = markovChain.get("_end");
+		
 		// Keep looping through the words until we've reached the end
-		while (!nextWord.contains(".")&&!nextWord.contains("?")&&!nextWord.contains("!")) {
+		while (!nextWord.contains(".") && !nextWord.contains("?") && !nextWord.contains("!")) {
 			Vector<String> wordSelection = markovChain.get(nextWord);
+			if(wordSelection==null) {
+				return null;
+			}
 			int wordSelectionLen = wordSelection.size();
 			nextWord = wordSelection.get(rnd.nextInt(wordSelectionLen));
 			newPhrase.add(nextWord);
+			if(end.contains(nextWord)) {
+				final String s = nextWord;
+				long first = end.stream().filter((str) -> {if(s.equalsIgnoreCase(str)) return true; return false;}).count();
+				Vector<String> next = markovChain.get(nextWord);
+				if(next==null) {
+					break;
+				}
+				long second = next.size();
+				double d = ((double)first) / ((double)second);
+				d = d / ((double)(first+second));
+				if(Math.random()<=d) {
+					break;
+				}
+			}
 		}
-		return newPhrase.toString();
+		return String.join(" ", newPhrase);
 	}
 }
