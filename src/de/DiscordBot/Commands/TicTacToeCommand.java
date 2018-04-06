@@ -130,7 +130,7 @@ public class TicTacToeCommand extends DiscordCommand implements EventListener {
 				}
 			}
 		}
-		g.channel.sendMessage(msg.build()).queue();
+		g.lastId = g.channel.sendMessage(msg.build()).complete().getId();
 	}
 
 	@Override
