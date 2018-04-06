@@ -102,7 +102,7 @@ public class TicTacToeCommand extends DiscordCommand implements EventListener {
 				+ " vs " + (g.lastPlayer == 0 ? "__***" : "") + g.players[1].getNickname()
 				+ (g.lastPlayer == 0 ? "***__" : "") + "\n");
 		msg.append("To select a tile, write it's number in the chat\n");
-		msg.append("You can also change your Emote by adding it behind the number");
+		msg.append("You can also change your Emote by adding it behind the number\n");
 		int i = 1;
 		for (String[] row : g.board) {
 			for (String column : row) {
@@ -196,7 +196,7 @@ public class TicTacToeCommand extends DiscordCommand implements EventListener {
 			MessageReceivedEvent mre = (MessageReceivedEvent) event;
 			if (state.containsKey(mre.getChannel())) {
 				Game g = state.get(mre.getChannel());
-				if (mre.getMessage().getRawContent().length() == 1 || mre.getMessage().getRawContent().contains("<")) {
+				if (mre.getMessage().getRawContent().length() == 1) {
 					if (g.accepted) {
 						int cPlayer = 0;
 						if (g.lastPlayer == 0) {
