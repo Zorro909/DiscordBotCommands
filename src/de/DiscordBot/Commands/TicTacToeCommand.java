@@ -98,9 +98,9 @@ public class TicTacToeCommand extends DiscordCommand implements EventListener {
 		MessageBuilder msg = new MessageBuilder();
 
 		msg.append("Tic Tac Toe\n");
-		msg.append((g.lastPlayer == 1 ? "__***" : "") + g.players[0].getNickname() + (g.lastPlayer == 1 ? "__***" : "")
+		msg.append((g.lastPlayer == 1 ? "__***" : "") + g.players[0].getNickname() + (g.lastPlayer == 1 ? "***__" : "")
 				+ " vs " + (g.lastPlayer == 0 ? "__***" : "") + g.players[1].getNickname()
-				+ (g.lastPlayer == 0 ? "__***" : "") + "\n");
+				+ (g.lastPlayer == 0 ? "***__" : "") + "\n");
 		msg.append("To select a tile, write it's number in the chat\n");
 		msg.append("You can also change your Emote by adding it behind the number");
 		int i = 1;
@@ -196,49 +196,54 @@ public class TicTacToeCommand extends DiscordCommand implements EventListener {
 			MessageReceivedEvent mre = (MessageReceivedEvent) event;
 			if (state.containsKey(mre.getChannel())) {
 				Game g = state.get(mre.getChannel());
-				if (g.accepted) {
-					int cPlayer = 0;
-					if (g.lastPlayer == 0) {
-						cPlayer = 1;
-					}
-					if (g.players[cPlayer].getUser().getId().equals(mre.getAuthor().getId())) {
-						if(g.round<2&&mre.getMessage().getEmotes().size()>0) {
-							Emote e = mre.getMessage().getEmotes().get(0);
-							if(e.isFake()) {
-								mre.getChannel().sendMessage("I can't use the emote " + e.getName() + "... :cry:").queue();
-							}else {
-								g.emojis[cPlayer] = e.getId();
+				if (mre.getMessage().getRawContent().length() == 1 || mre.getMessage().getRawContent().contains("<")) {
+					if (g.accepted) {
+						int cPlayer = 0;
+						if (g.lastPlayer == 0) {
+							cPlayer = 1;
+						}
+						if (g.players[cPlayer].getUser().getId().equals(mre.getAuthor().getId())) {
+							int l = 0;
+							try {
+								l = Integer.parseInt(mre.getMessage().getRawContent().substring(0, 1)) - 1;
+							} catch (Exception e) {
+								return;
 							}
-						}else if(g.round<2) {
-							if(mre.getMessage().getRawContent().length()>1) {
-								String emoji = mre.getMessage().getRawContent().substring(1);
-								if(emoji.length()<3) {
-									g.emojis[cPlayer] = emoji;
-								}else {
-									mre.getChannel().sendMessage("Your 'Emoji' is probably none... :angry:").queue();
+							if (g.round < 2 && mre.getMessage().getEmotes().size() > 0) {
+								Emote e = mre.getMessage().getEmotes().get(0);
+								if (e.isFake()) {
+									mre.getChannel().sendMessage("I can't use the emote " + e.getName() + "... :cry:")
+											.queue();
+								} else {
+									g.emojis[cPlayer] = e.getId();
+								}
+							} else if (g.round < 2) {
+								if (mre.getMessage().getRawContent().length() > 1) {
+									String emoji = mre.getMessage().getRawContent().substring(1);
+									if (emoji.length() < 3) {
+										g.emojis[cPlayer] = emoji;
+									} else {
+										mre.getChannel().sendMessage("Your 'Emoji' is probably none... :angry:")
+												.queue();
+									}
 								}
 							}
+
+							if (l > 8 || l < 0) {
+								mre.getChannel().sendMessage("The tiles are numbered 1 through 9!").queue();
+								return;
+							}
+							if (g.board[Math.round(l / 3)][l % 3] != null) {
+								mre.getChannel().sendMessage("The tile " + (l + 1) + " was already chosen!");
+								return;
+							}
+							mre.getChannel().getMessageById(g.lastId).complete().delete().queue();
+							g.board[Math.round(l / 3)][l % 3] = g.emojis[cPlayer];
+							g.lastPlayer = cPlayer;
+							sendBoard(g);
+							mre.getMessage().delete().queue();
+							g.round++;
 						}
-						int l = 0;
-						try {
-							l = Integer.parseInt(mre.getMessage().getRawContent().substring(0, 1)) - 1;
-						} catch (Exception e) {
-							return;
-						}
-						if (l > 8 || l < 0) {
-							mre.getChannel().sendMessage("The tiles are numbered 1 through 9!").queue();
-							return;
-						}
-						if (g.board[Math.round(l / 3)][l % 3] != null) {
-							mre.getChannel().sendMessage("The tile " + (l + 1) + " was already chosen!");
-							return;
-						}
-						mre.getChannel().getMessageById(g.lastId).complete().delete().queue();
-						g.board[Math.round(l / 3)][l % 3] = g.emojis[cPlayer];
-						g.lastPlayer = cPlayer;
-						sendBoard(g);
-						mre.getMessage().delete().queue();
-						g.round++;
 					}
 				}
 			}
