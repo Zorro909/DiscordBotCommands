@@ -37,10 +37,11 @@ public class TicTacToeCommand extends DiscordCommand implements EventListener {
 			g.players[1] = m.getGuild().getMember(m.getMentionedUsers().get(0));
 			g.lastPlayer = Math.random() < 0.5 ? 0 : 1;
 
-			Message msg = new MessageBuilder().append(
+			Message ms = new MessageBuilder().append(
 					g.players[1].getAsMention() + " You were challenged to a game of Tic Tac Toe\nDo you accept?")
 					.build();
-			g.lastId = m.getChannel().sendMessage(msg).complete().getId();
+			Message msg = m.getChannel().sendMessage(ms).complete();
+			g.lastId = msg.getId();
 			msg.addReaction("\u1F44D").complete();
 			msg.addReaction("\u1F44E").complete();
 			DiscordBot.registerEmoteChangeListener(msg, new ListenerAdapter() {
