@@ -98,8 +98,8 @@ public class TicTacToeCommand extends DiscordCommand implements EventListener {
 		MessageBuilder msg = new MessageBuilder();
 
 		msg.append("Tic Tac Toe\n");
-		msg.append((g.lastPlayer == 1 ? "__***" : "") + g.players[0].getNickname() + (g.lastPlayer == 1 ? "***__" : "")
-				+ " vs " + (g.lastPlayer == 0 ? "__***" : "") + g.players[1].getNickname()
+		msg.append((g.lastPlayer == 1 ? "__***" : "") + g.players[0].getEffectiveName() + (g.lastPlayer == 1 ? "***__" : "")
+				+ " vs " + (g.lastPlayer == 0 ? "__***" : "") + g.players[1].getEffectiveName()
 				+ (g.lastPlayer == 0 ? "***__" : "") + "\n");
 		msg.append("To select a tile, write it's number in the chat\n");
 		msg.append("You can also change your Emote by adding it behind the number\n");
@@ -205,7 +205,7 @@ public class TicTacToeCommand extends DiscordCommand implements EventListener {
 						if (g.players[cPlayer].getUser().getId().equals(mre.getAuthor().getId())) {
 							int l = 0;
 							try {
-								l = Integer.parseInt(mre.getMessage().getRawContent().substring(0, 1)) - 1;
+								l = Integer.parseInt(mre.getMessage().getContent().substring(0, 1)) - 1;
 							} catch (Exception e) {
 								return;
 							}
@@ -219,8 +219,8 @@ public class TicTacToeCommand extends DiscordCommand implements EventListener {
 								}
 							} else if (g.round < 2) {
 								if (mre.getMessage().getRawContent().length() > 1) {
-									String emoji = mre.getMessage().getRawContent().substring(1);
-									if (emoji.length() < 3) {
+									String emoji = mre.getMessage().getRawContent().substring(1).trim();
+									if (emoji.startsWith("<")) {
 										g.emojis[cPlayer] = emoji;
 									} else {
 										mre.getChannel().sendMessage("Your 'Emoji' is probably none... :angry:")
