@@ -51,10 +51,10 @@ public class TicTacToeCommand extends DiscordCommand implements EventListener {
 					if (g.accepted == true)
 						return;
 					if (gmrae.getMember().getUser().getId().equals(g.players[1].getUser().getId())) {
-						if (gmrae.getReactionEmote().getName().equals("\u1F44D")) {
+						if (gmrae.getReactionEmote().getName().equals("👍")) {
 							g.accepted = true;
 							sendBoard(g);
-						} else if (gmrae.getReactionEmote().getName().equals("\u1F44E")) {
+						} else if (gmrae.getReactionEmote().getName().equals("👎")) {
 							g.accepted = false;
 							msg.delete().submit();
 							m.getChannel()
