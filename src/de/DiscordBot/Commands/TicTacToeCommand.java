@@ -65,7 +65,27 @@ public class TicTacToeCommand extends DiscordCommand implements EventListener {
 						}
 					}
 				}
-			});
+			},2*60*1000);
+			new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					try {
+						Thread.sleep(2*60*1000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					if(!g.accepted) {
+						if(state.containsKey(m.getChannel())) {
+							state.remove(m.getChannel());
+							m.getChannel().getMessageById(g.lastId).complete().delete().queue();
+							m.getChannel().sendMessage(m.getAuthor().getAsMention() + " Sorry but your Request was ignored... :cry:").queue();
+						}
+					}
+				}
+				
+			}).start();
 			state.put(m.getChannel(), g);
 			return "";
 		}
