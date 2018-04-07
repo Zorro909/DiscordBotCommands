@@ -98,11 +98,12 @@ public class TicTacToeCommand extends DiscordCommand implements EventListener {
 		MessageBuilder msg = new MessageBuilder();
 
 		msg.append("Tic Tac Toe\n");
-		msg.append((g.lastPlayer == 1 ? "__***" : "") + g.players[0].getEffectiveName() + (g.lastPlayer == 1 ? "***__" : "")
-				+ " vs " + (g.lastPlayer == 0 ? "__***" : "") + g.players[1].getEffectiveName()
-				+ (g.lastPlayer == 0 ? "***__" : "") + "\n");
+		msg.append((g.lastPlayer == 1 ? "__***" : "") + g.players[0].getEffectiveName()
+				+ (g.lastPlayer == 1 ? "***__" : "") + " vs " + (g.lastPlayer == 0 ? "__***" : "")
+				+ g.players[1].getEffectiveName() + (g.lastPlayer == 0 ? "***__" : "") + "\n");
 		msg.append("To select a tile, write it's number in the chat\n");
-		msg.append("You can also change your Emote by adding it behind the number\n");
+		if (g.round < 2)
+			msg.append("You can also change your Emote by adding it behind the number\n");
 		int i = 1;
 		for (String[] row : g.board) {
 			for (String column : row) {
@@ -209,16 +210,17 @@ public class TicTacToeCommand extends DiscordCommand implements EventListener {
 							} catch (Exception e) {
 								return;
 							}
-							if (g.round < 2 && mre.getMessage().getEmotes().size() > 0) {
-								Emote e = mre.getMessage().getEmotes().get(0);
-								if (e.isFake()) {
-									mre.getChannel().sendMessage("I can't use the emote " + e.getName() + "... :cry:")
-											.queue();
-								} else {
-									g.emojis[cPlayer] = e.getId();
-								}
-							} else if (g.round < 2) {
-								if (mre.getMessage().getRawContent().length() > 1) {
+							if (g.round < 2) {
+								if (mre.getMessage().getEmotes().size() > 0) {
+									Emote e = mre.getMessage().getEmotes().get(0);
+									if (e.isFake()) {
+										mre.getChannel()
+												.sendMessage("I can't use the emote " + e.getName() + "... :cry:")
+												.queue();
+									} else {
+										g.emojis[cPlayer] = e.getId();
+									}
+								} else if (mre.getMessage().getRawContent().toCharArray().length > 1) {
 									String emoji = mre.getMessage().getRawContent().substring(1).trim();
 									g.emojis[cPlayer] = emoji;
 								}
