@@ -26,6 +26,9 @@ public class GraphCommand extends DiscordCommand {
 
 	@Override
 	public Object execute(String command, String[] args, Message m) {
+		if(args.length<3) {
+			return new MessageBuilder().append("Usage: " + getUsage()).build();
+		}
 		Config c = getConfig(m.getGuild());
 		String p = c.getValue("precision", "0.05");
 		double precision = Double.valueOf(p);
