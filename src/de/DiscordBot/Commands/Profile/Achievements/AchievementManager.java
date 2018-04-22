@@ -1,5 +1,6 @@
 package de.DiscordBot.Commands.Profile.Achievements;
 
+import java.net.URLEncoder;
 import java.util.LinkedList;
 
 import de.DiscordBot.Commands.Profile.Achievements.Commands.CommandAchievement;
@@ -27,8 +28,10 @@ public class AchievementManager {
 	}
 	
 	public static void achievedAchievement(TextChannel tc, User u, Config c, String achievement) {
+		c.setValue("achievement_" + URLEncoder.encode(achievement), true);
 		MessageBuilder mb = new MessageBuilder();
-		mb.append("Hoooray ").append(u).append(", you unlocked the Achievement \"" + achievement + "\" :smile:");
+		Message m = mb.append("Hoooray ").append(u).append(", you unlocked the Achievement \"" + achievement + "\" :smile:").build();
+		tc.sendMessage(m);
 	}
 	
 }
