@@ -2,7 +2,9 @@ package de.DiscordBot.Commands;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.LinkedList;
@@ -15,6 +17,8 @@ import de.DiscordBot.Config.Config;
 import de.DiscordBot.Config.ConfigPage;
 import de.DiscordBot.Config.ConfigurableOption;
 import de.DiscordBot.Config.OptionType;
+import javautils.HTTPManager.InetManager;
+import javautils.UtilHelpers.FileUtils;
 import net.dean.jraw.RedditClient;
 import net.dean.jraw.http.NetworkException;
 import net.dean.jraw.http.UserAgent;
@@ -107,7 +111,10 @@ public class RandomMeme extends DiscordCommand {
     Submission s = (Submission) o[1];
     try {
       File cache = new File(new Random().nextInt(9999) + ".png");
-      ImageIO.write(ImageIO.read(bi), "png", cache);
+      PrintWriter pw = new PrintWriter(new FileWriter(cache));
+      pw.println(InetManager.openConnection(bi).get());
+      pw.flush();
+      pw.close();
       if (cache.length() > (8 << 20)) {
     	  MessageBuilder mb = new MessageBuilder().append("Your random image: \n");
     	  mb.append(bi.toString());
