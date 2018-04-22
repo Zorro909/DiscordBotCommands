@@ -11,8 +11,8 @@ public class ProfileCommand extends DiscordCommand{
 
 	static Config config;
 	
-	public ProfileCommand(String cmdName, String[] commandAliases, String description, String usage) {
-		super(cmdName, commandAliases, description, usage);
+	public ProfileCommand() {
+		super("profile", new String[] {}, "WIP", "WIP");
 		config = getGlobalConfig();
 		DiscordBot.startService(new AchievementService(config));
 		
