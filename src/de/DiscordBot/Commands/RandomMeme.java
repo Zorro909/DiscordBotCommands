@@ -39,19 +39,24 @@ public class RandomMeme extends DiscordCommand {
 
   public static RedditClient rc;
 
-  private static Object[] getRandomImg(String string) {
-
+  private static Object[] getRandomImg(String string, int deep) {
+	if(deep==5) {
+		return null;
+	}
     Submission s = rc.getRandomSubmission(string);
-    BufferedImage bi = null;
+    if(s.isNsfw()) {
+    	return new Object[] {};
+    }
+    URL bi = null;
     while (bi == null) {
       try {
         if (s.getOEmbedMedia() != null) {
-          bi = ImageIO.read(s.getOEmbedMedia().getThumbnail().getUrl());
+          bi = s.getOEmbedMedia().getThumbnail().getUrl();
         } else {
-          bi = ImageIO.read(new URL(s.getUrl()));
+          bi = new URL(s.getUrl());
         }
       } catch (Exception e) {
-        s = rc.getRandomSubmission(string);
+        return getRandomImg(string, deep+1);
       }
     }
 
@@ -92,16 +97,24 @@ public class RandomMeme extends DiscordCommand {
     if(args.length>0) {
       subreddit = args[0];
     }
-    Object[] o = getRandomImg(subreddit);
-    BufferedImage bi = (BufferedImage) o[0];
+    Object[] o = getRandomImg(subreddit, 1);
+    if(o == null) {
+    	return new MessageBuilder().append("Sorry, no fitting Image could be found... :(").build();
+    }else if(o.length==0) {
+    	return new MessageBuilder().append("Sorry, NSFW images are not allowed, you're lewd...").build();
+    }
+    URL bi = (URL) o[0];
     Submission s = (Submission) o[1];
     try {
       File cache = new File(new Random().nextInt(9999) + ".png");
+      ImageIO.write(ImageIO.read(bi), "png", cache);
       if (cache.length() > (8 << 20)) {
-        return execute(command,args,m);
+    	  MessageBuilder mb = new MessageBuilder().append("Your random image: \n");
+    	  mb.append(bi.toString());
+    	  cache.delete();
+    	  return mb.build();
       }
-      ImageIO.write(bi, "png", cache);
-      MessageBuilder mb = new MessageBuilder().append("Your random meme: ");
+      MessageBuilder mb = new MessageBuilder().append("Your random image: ");
       m.getChannel().sendFile(cache, s.getTitle() + ".png", mb.build()).complete();
       cache.delete();
       return "";
