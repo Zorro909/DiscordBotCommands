@@ -37,117 +37,100 @@ import net.dv8tion.jda.core.entities.User;
 
 public class RandomMeme extends DiscordCommand {
 
-  public RandomMeme() {
-    super("randommeme", new String[] {"rmem", "rmeme", "meme", "reddit"}, "Searches for a random image on a subreddit (default: /r/memes)", "\\randommeme {subreddit}");
-  }
-
-  public static RedditClient rc;
-
-  private static Object[] getRandomImg(String string, int deep) {
-	if(deep==5) {
-		return null;
+	public RandomMeme() {
+		super("randommeme", new String[] { "rmem", "rmeme", "meme", "reddit" },
+				"Searches for a random image on a subreddit (default: /r/memes)", "\\randommeme {subreddit}");
 	}
-    Submission s = rc.getRandomSubmission(string);
-    if(s.isNsfw()) {
-    	return new Object[] {};
-    }
-    URL bi = null;
-    while (bi == null) {
-      try {
-        if (s.getOEmbedMedia() != null) {
-          bi = s.getOEmbedMedia().getThumbnail().getUrl();
-        } else {
-          bi = new URL(s.getUrl());
-        }
-      } catch (Exception e) {
-        return getRandomImg(string, deep+1);
-      }
-    }
 
-    return new Object[] { bi, s };
-  }
+	public static RedditClient rc;
 
-  static void initiateRC() {
-    Credentials c = Credentials
-            .script("Zorro909HD", "Zorro909HD", "GO6UsElDHOoGbA", "iFIFYPtBVOqEpdPoeQCNSMp-vds");
+	private static Object[] getRandomImg(String string, int deep) {
+		if (deep == 5) {
+			return null;
+		}
+		Submission s = rc.getRandomSubmission(string);
+		if (s.isNsfw()) {
+			return new Object[] {};
+		}
+		URL bi = null;
+		while (bi == null) {
+			try {
+				if (s.getOEmbedMedia() != null) {
+					bi = s.getOEmbedMedia().getThumbnail().getUrl();
+				} else {
+					bi = new URL(s.getUrl());
+				}
+			} catch (Exception e) {
+				return getRandomImg(string, deep + 1);
+			}
+		}
 
-    rc = new RedditClient(UserAgent.of("desktop:LewdBot:1.0(by /u/Zorro909HD)"));
-    OAuthHelper oa = rc.getOAuthHelper();
-    try {
-      OAuthData oad = oa.easyAuth(c);
-      System.out.println(oa.getAuthStatus().name());
-      rc.authenticate(oad);
-    } catch (NetworkException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (OAuthException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-  }
+		return new Object[] { bi, s };
+	}
 
-  @Override
-  public Object execute(String command, String[] args, Message m) {
-    if (rc == null || !rc.isAuthenticated()) {
-      initiateRC();
-    }
-    String subreddit = "memes";
-    try {
-      subreddit = getConfig(m.getGuild()).getValue("defaultSubreddit");
-    } catch (SQLException | InterruptedException e1) {
-      // TODO Auto-generated catch block
-      e1.printStackTrace();
-    }
-    if(args.length>0) {
-      subreddit = args[0];
-    }
-    Object[] o = getRandomImg(subreddit, 1);
-    if(o == null) {
-    	return new MessageBuilder().append("Sorry, no fitting Image could be found... :(").build();
-    }else if(o.length==0) {
-    	return new MessageBuilder().append("Sorry, NSFW images are not allowed, you're lewd...").build();
-    }
-    URL bi = (URL) o[0];
-    Submission s = (Submission) o[1];
-    try {
-      File cache = new File(new Random().nextInt(9999) + ".png");
-      PrintWriter pw = new PrintWriter(new FileWriter(cache));
-      pw.println(InetManager.openConnection(bi).get());
-      pw.flush();
-      pw.close();
-      if (cache.length() > (8 << 20)) {
-    	  MessageBuilder mb = new MessageBuilder().append("Your random image: \n");
-    	  mb.append(bi.toString());
-    	  cache.delete();
-    	  return mb.build();
-      }
-      MessageBuilder mb = new MessageBuilder().append("Your random image: ");
-      m.getChannel().sendFile(cache, s.getTitle() + ".png", mb.build()).complete();
-      cache.delete();
-      return "";
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-    return null;
-  }
+	static void initiateRC() {
+		Credentials c = Credentials.script("Zorro909HD", "Zorro909HD", "GO6UsElDHOoGbA", "iFIFYPtBVOqEpdPoeQCNSMp-vds");
 
-  @Override
-  public void setupCommandConfig(Guild g, Config cfg) {
-    cfg.setValue("defaultSubreddit", "memes");
-  }
+		rc = new RedditClient(UserAgent.of("desktop:LewdBot:1.0(by /u/Zorro909HD)"));
+		OAuthHelper oa = rc.getOAuthHelper();
+		try {
+			OAuthData oad = oa.easyAuth(c);
+			System.out.println(oa.getAuthStatus().name());
+			rc.authenticate(oad);
+		} catch (NetworkException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (OAuthException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
-  @Override
-  public ConfigPage createRemoteConfigurable() {
-    LinkedList<ConfigurableOption> conf =new LinkedList<>();
-    conf.add(new ConfigurableOption(this, "Meme Subreddit", "Which subreddit to use for getting memes", OptionType.STRING, "defaultSubreddit", new String[] {}));
-    return new ConfigPage("/r/Meme", this, conf);
-  }
+	@Override
+	public Object execute(String command, String[] args, Message m) {
+		if (rc == null || !rc.isAuthenticated()) {
+			initiateRC();
+		}
+		String subreddit = "memes";
+		try {
+			subreddit = getConfig(m.getGuild()).getValue("defaultSubreddit");
+		} catch (SQLException | InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		if (args.length > 0) {
+			subreddit = args[0];
+		}
+		Object[] o = getRandomImg(subreddit, 1);
+		if (o == null) {
+			return new MessageBuilder().append("Sorry, no fitting Image could be found... :(").build();
+		} else if (o.length == 0) {
+			return new MessageBuilder().append("Sorry, NSFW images are not allowed, you're lewd...").build();
+		}
+		URL bi = (URL) o[0];
+		Submission s = (Submission) o[1];
+		MessageBuilder mb = new MessageBuilder().append("Your random image: \n");
+		mb.append(bi.toString());
+		return mb.build();
+	}
 
-  @Override
-  public boolean isRemoteConfigurable() {
-    // TODO Auto-generated method stub
-    return true;
-  }
+	@Override
+	public void setupCommandConfig(Guild g, Config cfg) {
+		cfg.setValue("defaultSubreddit", "memes");
+	}
+
+	@Override
+	public ConfigPage createRemoteConfigurable() {
+		LinkedList<ConfigurableOption> conf = new LinkedList<>();
+		conf.add(new ConfigurableOption(this, "Meme Subreddit", "Which subreddit to use for getting memes",
+				OptionType.STRING, "defaultSubreddit", new String[] {}));
+		return new ConfigPage("/r/Meme", this, conf);
+	}
+
+	@Override
+	public boolean isRemoteConfigurable() {
+		// TODO Auto-generated method stub
+		return true;
+	}
 
 }
