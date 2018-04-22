@@ -28,10 +28,10 @@ public class AchievementManager {
 	}
 	
 	public static void achievedAchievement(TextChannel tc, User u, Config c, String achievement) {
-		c.setValue("achievement_" + URLEncoder.encode(achievement), true);
+		c.setValue("achievement_" + u.getId() + "_" + URLEncoder.encode(achievement), true);
 		MessageBuilder mb = new MessageBuilder();
 		Message m = mb.append("Hoooray ").append(u).append(", you unlocked the Achievement \"" + achievement + "\" :smile:").build();
-		tc.sendMessage(m);
+		tc.sendMessage(m).queue();
 	}
 	
 }
