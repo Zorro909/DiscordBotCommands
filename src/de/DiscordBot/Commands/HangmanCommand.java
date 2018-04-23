@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Random;
 
 import de.DiscordBot.DiscordBot;
+import de.DiscordBot.Commands.Profile.Achievements.Types.CounterAchievement;
 import de.DiscordBot.Config.Config;
 import de.DiscordBot.Config.ConfigPage;
 import de.DiscordBot.Config.ConfigurableOption;
@@ -19,6 +20,7 @@ import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
+import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.EventListener;
@@ -26,7 +28,8 @@ import net.dv8tion.jda.core.hooks.EventListener;
 public class HangmanCommand extends DiscordCommand implements EventListener {
 
   List<String> wordlist;
-
+  CounterAchievement hangmanWins;
+  
   public HangmanCommand() {
     super("hangman", new String[] {}, "Let's you play a round of Hangman", "\\hangman");
 
@@ -37,6 +40,8 @@ public class HangmanCommand extends DiscordCommand implements EventListener {
       e.printStackTrace();
     }
     DiscordBot.getBot().addEventListener(this);
+    
+    hangmanWins = CounterAchievement.createStaticCounterAchievement("hangman_wins", "HangmanAchievement");
   }
 
   HashMap<MessageChannel, Game> state = new HashMap<MessageChannel, Game>();
@@ -58,7 +63,7 @@ public class HangmanCommand extends DiscordCommand implements EventListener {
         if (c == ' ') {
           underscores += "  ";
         } else {
-          if (g.guesses.contains(Character.valueOf(c))) {
+          if (g.guesses.containsKey(Character.valueOf(c))) {
             underscores += c + " ";
           } else {
             underscores += "_ ";
@@ -88,7 +93,7 @@ public class HangmanCommand extends DiscordCommand implements EventListener {
     MessageChannel       channel;
     String               word    = "";
     int                  wrongs  = 0;
-    ArrayList<Character> guesses = new ArrayList<Character>();
+    HashMap<Character, User> guesses = new HashMap<Character, User>();
 
   }
 
@@ -102,19 +107,19 @@ public class HangmanCommand extends DiscordCommand implements EventListener {
           char guess = mre.getMessage().getContent().toLowerCase().charAt(0);
           Game g = state.get(mre.getChannel());
           mre.getMessage().delete().submit();
-          if (g.guesses.contains(Character.valueOf(guess))) {
+          if (g.guesses.containsKey(Character.valueOf(guess))) {
             g.channel.sendMessage("The Letter " + guess + " was already guessed!").submit();
           } else {
             if (!g.word.contains(guess + "")) {
               g.wrongs++;
             }
-            g.guesses.add(Character.valueOf(guess));
+            g.guesses.put(Character.valueOf(guess), mre.getAuthor());
             String underscores = "";
             for (char c : g.word.toCharArray()) {
               if (c == ' ') {
                 underscores += "  ";
               } else {
-                if (g.guesses.contains(Character.valueOf(c))) {
+                if (g.guesses.containsKey(Character.valueOf(c))) {
                   underscores += c + " ";
                 } else {
                   underscores += "_ ";
@@ -139,6 +144,24 @@ public class HangmanCommand extends DiscordCommand implements EventListener {
                       .appendCodeBlock(
                               "Guesses: " + g.guesses.size() + "\nWord: " + underscores, "")
                       .append("You've won! Appreciate it! Party-Time!").build();
+              HashMap<User, Integer> rightGuesses = new HashMap<User, Integer>();
+              int most = 0;
+              User m = null;
+              for(Character c : g.guesses.keySet()) {
+            	  if(underscores.contains(c+"")) {
+            		  int i = 0;
+            		  if(rightGuesses.containsKey(g.guesses.get(c))) {
+            			 i = rightGuesses.get(g.guesses.get(c)); 
+            		  }
+            		  i++;
+            		  rightGuesses.put(g.guesses.get(c), i);
+            		  if(i>most) {
+            			  most = i;
+            			  m = g.guesses.get(c);
+            		  }
+            	  }
+              }
+              hangmanWins.increaseCount(m, mre.getChannel());
               mre.getChannel().sendMessage(msg).submit();
               state.remove(mre.getChannel());
               return;

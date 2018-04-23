@@ -9,7 +9,7 @@ import net.dv8tion.jda.core.entities.Message;
 
 public class ProfileCommand extends DiscordCommand{
 
-	static Config config;
+	public static Config config;
 	
 	public ProfileCommand() {
 		super("profile", new String[] {}, "WIP", "WIP");
