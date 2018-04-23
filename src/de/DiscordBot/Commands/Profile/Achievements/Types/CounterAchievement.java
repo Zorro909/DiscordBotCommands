@@ -12,7 +12,7 @@ import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.User;
 
-public abstract class CounterAchievement implements Achievement {
+public abstract class CounterAchievement extends Achievement {
 
 	String[] progressStages;
 	String id;
@@ -26,18 +26,22 @@ public abstract class CounterAchievement implements Achievement {
 		this.progressStages = progress;
 	}
 	
+	public CounterAchievement(String id, String[] progress, boolean messages) {
+		super(messages);
+		this.id = id.trim();
+		for(int i = 0;i<progress.length;i++) {
+			progress[i] = progress[i].trim();
+		}
+		this.progressStages = progress;
+	}
+	
 	public static CounterAchievement createStaticCounterAchievement(String id, String resourceFile) {
-		return new CounterAchievement(id, readResources(resourceFile)) {
-			
+		return new CounterAchievement(id, readResources(resourceFile), false) {
 			@Override
 			public boolean processCounter(Message m) {
 				return false;
 			}
-			
-			@Override
-			public void process(Message m, Config c) {
-			}
-		};
+	    };
 	}
 
 	public abstract boolean processCounter(Message m);

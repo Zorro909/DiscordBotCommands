@@ -3,6 +3,8 @@ package de.DiscordBot.Commands.Profile.Achievements;
 import java.net.URLEncoder;
 import java.util.LinkedList;
 
+import org.apache.commons.collections4.map.LinkedMap;
+
 import de.DiscordBot.Commands.Profile.ProfileCommand;
 import de.DiscordBot.Commands.Profile.Achievements.Commands.CommandAchievement;
 import de.DiscordBot.Config.Config;
@@ -15,17 +17,19 @@ import net.dv8tion.jda.core.entities.User;
 
 public class AchievementManager {
 
-	static LinkedList<Achievement> achievements = new LinkedList<Achievement>();
+	static LinkedMap<Achievement, Boolean> achievements = new LinkedMap<Achievement, Boolean>();
 	
 	static {
-		achievements.add(new CommandAchievement());
+		new CommandAchievement();
 	}
 	
 	
 	
 	public static void processMessage(Message m, Config c) {
-		for(Achievement a : achievements) {
+		for(Achievement a : achievements.keySet()) {
+			if(achievements.get(a)) {
 			a.process(m, c);
+			}
 		}
 	}
 	
