@@ -6,7 +6,7 @@ import net.dv8tion.jda.core.entities.Message;
 public class CommandAchievement extends CounterAchievement {
 
 	public CommandAchievement() {
-		super("", readResources("CommandAchievement"));
+		super("commands", readResources("CommandAchievement"));
 	}
 
 	@Override

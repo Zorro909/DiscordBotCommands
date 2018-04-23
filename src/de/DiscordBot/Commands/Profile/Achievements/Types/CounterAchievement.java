@@ -43,7 +43,7 @@ public abstract class CounterAchievement implements Achievement {
 	public abstract boolean processCounter(Message m);
 
 	public void increaseCount(User u, MessageChannel reward) {
-		String id = this.id + "_" + u.getId();
+		String id = this.id + "_" + u.getId() + "_count";
 		Config c = ProfileCommand.config;
 		c.setIntValue(id, c.getIntValue(id, 0) + 1);
 		int amount = c.getIntValue(id, 0);
