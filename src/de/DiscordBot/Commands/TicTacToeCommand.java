@@ -3,6 +3,7 @@ package de.DiscordBot.Commands;
 import java.util.HashMap;
 
 import de.DiscordBot.DiscordBot;
+import de.DiscordBot.Commands.Profile.Achievements.Types.CounterAchievement;
 import de.DiscordBot.Config.Config;
 import de.DiscordBot.Config.ConfigPage;
 import net.dv8tion.jda.client.managers.EmoteManager;
@@ -20,10 +21,14 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public class TicTacToeCommand extends DiscordCommand implements EventListener {
 
+	CounterAchievement TicTacToeWins;
+	
 	public TicTacToeCommand() {
 		super("tictactoe", new String[] {}, "Let's you play a round of tic tac toe against someone else",
 				"\\tictactoe @Opponent");
 		DiscordBot.getBot().addEventListener(this);
+		
+		TicTacToeWins = CounterAchievement.createStaticCounterAchievement("tictactoe_wins", "TicTacToeAchievement");
 	}
 
 	@Override
@@ -141,8 +146,10 @@ public class TicTacToeCommand extends DiscordCommand implements EventListener {
 			String winner = "";
 			if (wonEmote.equals(g.emojis[0])) {
 				winner = g.players[0].getAsMention();
+				TicTacToeWins.increaseCount(g.players[0].getUser(), g.channel);
 			} else {
 				winner = g.players[1].getAsMention();
+				TicTacToeWins.increaseCount(g.players[1].getUser(), g.channel);
 			}
 			msg.append(winner + " has won the game!\nCongratulations :clap:");
 		}
