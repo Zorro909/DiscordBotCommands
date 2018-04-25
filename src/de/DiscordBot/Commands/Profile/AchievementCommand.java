@@ -38,7 +38,7 @@ public class AchievementCommand extends DiscordCommand {
 		}
 		MessageBuilder mb = new MessageBuilder();
 		mb.append("Achievement List:\nPage " + page);
-		String display = String.join("\n", achievements.subList(start, start+8));
+		String display = String.join("\n", achievements.subList(start, (achievements.size()-1 < start+8) ? achievements.size() : start+8));
 		mb.appendCodeBlock(display, null);
 		mb.append("Pages: ");
 		for(int i = 1; i-1 < (double) achievements.size() / 8.0; i++) {
