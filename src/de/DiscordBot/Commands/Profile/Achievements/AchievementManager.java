@@ -43,12 +43,12 @@ public class AchievementManager {
 		
 		return bools.entrySet().stream()
 				.filter((Map.Entry<String, Boolean> entry) -> entry.getValue())
-				.map((Map.Entry<String, Boolean> entry) -> URLDecoder.decode(entry.getKey()))
+				.map((Map.Entry<String, Boolean> entry) -> entry.getKey().split("_",3)[2])
 				.collect(Collectors.toList());
 	}
 
 	public static void achievedAchievement(MessageChannel tc, User u, String achievement) {
-		ProfileCommand.config.setValue("achievement_" + u.getId() + "_" + URLEncoder.encode(achievement), true);
+		ProfileCommand.config.setValue("achievement_" + u.getId() + "_" + achievement, true);
 		MessageBuilder mb = new MessageBuilder();
 		Message m = mb.append("Hoooray ").append(u)
 				.append(", you unlocked the Achievement \"" + achievement + "\" :smile:").build();
