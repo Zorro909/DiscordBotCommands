@@ -43,7 +43,7 @@ public class AchievementManager {
 		
 		return bools.entrySet().stream()
 				.filter((Map.Entry<String, Boolean> entry) -> entry.getValue())
-				.map((Map.Entry<String, Boolean> entry) -> URLDecoder.decode(p.matcher(entry.getKey()).group(1)))
+				.map((Map.Entry<String, Boolean> entry) -> URLDecoder.decode(entry.getKey()))
 				.collect(Collectors.toList());
 	}
 
