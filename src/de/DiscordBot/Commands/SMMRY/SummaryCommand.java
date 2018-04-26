@@ -23,11 +23,11 @@ public class SummaryCommand extends DiscordCommand{
 			return new MessageBuilder().append("Usage: ").appendCodeBlock(getUsage(), null).build();
 		}
 		String url = String.join(" ", args);
-		Summary s = smmry.newSummaryBuilder().website(url).withBreak().sentences(5).build();
+		Summary s = smmry.newSummaryBuilder().website(url).withBreak().withEncode().sentences(5).build();
 		if(s.hasError()) {
 			return new MessageBuilder().append("An Error occured...\nError Message: " + s.getMessage() + "\nError Code: " + s.getError()).build();
 		}
-		return new MessageBuilder().append("Summary for: " + url).appendCodeBlock(s.getSummary().replace("[BREAK]", "\n"), null).build();
+		return new MessageBuilder().append("Summary for: " + url).appendCodeBlock(s.getSummary().replace("'", "\"").replace("[BREAK]", "\n"), null).build();
 	}
 
 	@Override

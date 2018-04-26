@@ -62,6 +62,15 @@ class SummaryBuilder{
 		return this;
 	}
 	
+	public SummaryBuilder withEncode() {
+		return withEncode(true);
+	}
+
+	public SummaryBuilder withEncode(boolean withEncode) {
+		this.withEncode = withEncode;
+		return this;
+	}
+	
 	public SummaryBuilder avoidQuotes() {
 		return avoidQuotes(true);
 	}
