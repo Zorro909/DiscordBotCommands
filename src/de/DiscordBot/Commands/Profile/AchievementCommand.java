@@ -42,7 +42,13 @@ public class AchievementCommand extends DiscordCommand {
 		mb.appendCodeBlock(display, null);
 		mb.append("Pages: ");
 		for(int i = 1; i-1 < (double) achievements.size() / 8.0; i++) {
+			if(i==page) {
+				mb.append("___");
+			}
 			mb.append(i + " ");
+			if(i==page) {
+				mb.append("___");
+			}
 		}
 		return mb.build();
 	}
