@@ -19,3 +19,4 @@ de.DiscordBot.Commands.TicTacToeCommand
 de.DiscordBot.Commands.Profile.ProfileCommand
 de.DiscordBot.Commands.Profile.AchievementCommand
 de.DiscordBot.Commands.KittyCommand
+de.DiscordBot.Commands.SMMRY.SummaryCommand
