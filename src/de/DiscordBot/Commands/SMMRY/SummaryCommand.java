@@ -27,7 +27,7 @@ public class SummaryCommand extends DiscordCommand{
 		if(s.hasError()) {
 			return new MessageBuilder().append("An Error occured...\nError Message: " + s.getMessage() + "\nError Code: " + s.getError()).build();
 		}
-		return new MessageBuilder().append("Summary for: " + url).appendCodeBlock(s.getSummary().replace("'", "\"").replace("[BREAK]", "\n"), null).build();
+		return new MessageBuilder().append("Summary for: " + url + "\n").appendCodeBlock(s.getSummary().replace("'", "\"").replace("[BREAK]", "\n"), null).build();
 	}
 
 	@Override
