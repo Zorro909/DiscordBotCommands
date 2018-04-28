@@ -27,6 +27,7 @@ import lavalink.client.player.event.PlayerEventListenerAdapter;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.MessageReaction;
@@ -55,6 +56,7 @@ public class MusicService extends DiscordService {
 		l.connect(play);
 		ap = l.getPlayer();
 		MusicCommand.ll.onReady(new ReadyEvent(DiscordBot.getBot(), 0));
+		ap.setVolume(10);
 		dapm = new DefaultAudioPlayerManager();
 		dapm.registerSourceManager(new YoutubeAudioSourceManager(true));
 		dapm.registerSourceManager(new SoundCloudAudioSourceManager(true));
@@ -166,9 +168,9 @@ public class MusicService extends DiscordService {
 		if (at != null) {
 			eb.setAuthor(at.getInfo().author);
 			eb.addField("Playing: " + at.getInfo().title,
-					String.format("%d:%d:%d / %d:%d:%d", TimeUnit.MILLISECONDS.toHours(at.getPosition()),
-							TimeUnit.MILLISECONDS.toMinutes(at.getPosition()) % 60,
-							TimeUnit.MILLISECONDS.toSeconds(at.getPosition()) % 60,
+					String.format("%02d:%02d:%02d / %02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(ap.getTrackPosition()),
+							TimeUnit.MILLISECONDS.toMinutes(ap.getTrackPosition()) % 60,
+							TimeUnit.MILLISECONDS.toSeconds(ap.getTrackPosition()) % 60,
 							TimeUnit.MILLISECONDS.toHours(at.getDuration()),
 							TimeUnit.MILLISECONDS.toMinutes(at.getDuration()) % 60,
 							TimeUnit.MILLISECONDS.toSeconds(at.getDuration()) % 60),
@@ -216,11 +218,18 @@ public class MusicService extends DiscordService {
 					System.out.println(gmrae.getReactionEmote().getName());
 					Message m = gmrae.getChannel().getMessageById(gmrae.getMessageId()).complete();
 					Map<Object, Object> map = m.getReactions().stream().collect(Collectors.toMap(r -> ((MessageReaction)r).getReactionEmote().getName(), r -> ((MessageReaction)r).getCount()));
-					// STOP
+					double listeners = 0;
+					for(Member me : play.getMembers()) {
+						if(!me.getUser().isBot()) {
+							listeners++;
+						}
+					}
+					
+					// STOP					
 					if (gmrae.getReactionEmote().getName().equalsIgnoreCase("\u23F9")) {
 						try {
 							if (gmrae.getGuild().getMember(gmrae.getUser()).hasPermission(Permission.ADMINISTRATOR)
-									|| (int) map.get("\u23F9") >= (double) play.getMembers().size() / 2.0) {
+									|| (int) map.get("\u23F9") >= listeners / 2.0) {
 								stop();
 							}
 						} catch (Exception e) {
@@ -230,7 +239,7 @@ public class MusicService extends DiscordService {
 					} else if (gmrae.getReactionEmote().getName().equalsIgnoreCase("\u23F8")) {
 						try {
 							if (gmrae.getGuild().getMember(gmrae.getUser()).hasPermission(Permission.ADMINISTRATOR)
-									|| (int)map.get("\u23F8") >= (double) play.getMembers().size() / 2.0) {
+									|| (int)map.get("\u23F8") >= listeners / 2.0) {
 								pause();
 							}
 						} catch (Exception e) {
@@ -240,7 +249,7 @@ public class MusicService extends DiscordService {
 					} else if (gmrae.getReactionEmote().getName().equalsIgnoreCase("\u25B6")) {
 						try {
 							if (gmrae.getGuild().getMember(gmrae.getUser()).hasPermission(Permission.ADMINISTRATOR)
-									|| (int)map.get("\u25B6") >= (double) play.getMembers().size() / 2.0) {
+									|| (int)map.get("\u25B6") >= listeners / 2.0) {
 								unpause();
 							}
 						} catch (Exception e) {
@@ -250,7 +259,7 @@ public class MusicService extends DiscordService {
 					} else if (gmrae.getReactionEmote().getName().equalsIgnoreCase("\u23E9")) {
 						try {
 							if (gmrae.getGuild().getMember(gmrae.getUser()).hasPermission(Permission.ADMINISTRATOR)
-									|| (int)map.get("\u23E9") - 1 >= (double) play.getMembers().size() / 2.0) {
+									|| (int)map.get("\u23E9") - 1 >= listeners / 2.0) {
 								if (!skipTrack()) {
 									updates.sendMessage("Could not skip Track, maybe the queue is empty?").submit();
 								}
