@@ -145,14 +145,18 @@ public class MusicService extends DiscordService {
 	}
 
 	public void pause() {
+		if(!stop) {
 		pausedAt = System.currentTimeMillis();
 		paused = true;
 		ap.setPaused(true);
+		}
 	}
 
 	public void unpause() {
+		if(!stop) {
 		paused = false;
 		ap.setPaused(false);
+		}
 	}
 
 	Message last;
@@ -217,7 +221,13 @@ public class MusicService extends DiscordService {
 					}
 					System.out.println(gmrae.getReactionEmote().getName());
 					Message m = gmrae.getChannel().getMessageById(gmrae.getMessageId()).complete();
-					Map<Object, Object> map = m.getReactions().stream().collect(Collectors.toMap(r -> ((MessageReaction)r).getReactionEmote().getName(), r -> ((MessageReaction)r).getCount()));
+					Map<Object, Object> map = m.getReactions().stream().collect(Collectors.toMap(r -> ((MessageReaction)r).getReactionEmote().getName(), r -> ((MessageReaction)r).getUsers().complete().stream().filter(u -> {
+						if(u.isBot())return false;
+						if(play.getGuild().getMember(u).getVoiceState().getAudioChannel()==play) {
+							return true;
+						}
+						return false;
+					}).count()));
 					double listeners = 0;
 					for(Member me : play.getMembers()) {
 						if(!me.getUser().isBot()) {
@@ -228,8 +238,7 @@ public class MusicService extends DiscordService {
 					// STOP					
 					if (gmrae.getReactionEmote().getName().equalsIgnoreCase("\u23F9")) {
 						try {
-							if (gmrae.getGuild().getMember(gmrae.getUser()).hasPermission(Permission.ADMINISTRATOR)
-									|| (int) map.get("\u23F9") >= listeners / 2.0) {
+							if ((int) map.get("\u23F9") >= listeners / 2.0) {
 								stop();
 							}
 						} catch (Exception e) {
@@ -238,8 +247,7 @@ public class MusicService extends DiscordService {
 						// PAUSE
 					} else if (gmrae.getReactionEmote().getName().equalsIgnoreCase("\u23F8")) {
 						try {
-							if (gmrae.getGuild().getMember(gmrae.getUser()).hasPermission(Permission.ADMINISTRATOR)
-									|| (int)map.get("\u23F8") >= listeners / 2.0) {
+							if ((int)map.get("\u23F8") >= listeners / 2.0) {
 								pause();
 							}
 						} catch (Exception e) {
@@ -248,8 +256,7 @@ public class MusicService extends DiscordService {
 						// PLAY
 					} else if (gmrae.getReactionEmote().getName().equalsIgnoreCase("\u25B6")) {
 						try {
-							if (gmrae.getGuild().getMember(gmrae.getUser()).hasPermission(Permission.ADMINISTRATOR)
-									|| (int)map.get("\u25B6") >= listeners / 2.0) {
+							if ((int)map.get("\u25B6") >= listeners / 2.0) {
 								unpause();
 							}
 						} catch (Exception e) {
@@ -258,8 +265,7 @@ public class MusicService extends DiscordService {
 						// SKIP
 					} else if (gmrae.getReactionEmote().getName().equalsIgnoreCase("\u23E9")) {
 						try {
-							if (gmrae.getGuild().getMember(gmrae.getUser()).hasPermission(Permission.ADMINISTRATOR)
-									|| (int)map.get("\u23E9") - 1 >= listeners / 2.0) {
+							if ((int)map.get("\u23E9") - 1 >= listeners / 2.0) {
 								if (!skipTrack()) {
 									updates.sendMessage("Could not skip Track, maybe the queue is empty?").submit();
 								}
