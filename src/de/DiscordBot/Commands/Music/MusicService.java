@@ -1,6 +1,7 @@
 package de.DiscordBot.Commands.Music;
 
 import java.time.OffsetDateTime;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -318,6 +319,7 @@ public class MusicService extends DiscordService {
 						return;
 					}
 					int tracks = 0;
+					Collections.shuffle(playlist.getTracks());
 					for (AudioTrack at : playlist.getTracks()) {
 						try {
 							queue.put(at);
