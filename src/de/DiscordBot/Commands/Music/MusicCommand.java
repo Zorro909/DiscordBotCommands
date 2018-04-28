@@ -42,7 +42,7 @@ public class MusicCommand extends DiscordCommand {
 			return new EmbedBuilder().addField(new Field("Usage", getUsage(),true)).build();
 		}
 		if(m.getGuild().getMember(m.getAuthor()).getVoiceState().getAudioChannel()==null) {
-			return new MessageBuilder().append("You need to be in a VoiceChannel to be able to start the Music ");
+			return new MessageBuilder().append("You need to be in a VoiceChannel to be able to start the Music").build();
 		}
 		String search = join(args);
 		URL url = null;
