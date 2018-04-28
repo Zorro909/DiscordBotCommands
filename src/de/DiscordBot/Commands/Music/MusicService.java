@@ -56,7 +56,7 @@ public class MusicService extends DiscordService {
 		l.connect(play);
 		ap = l.getPlayer();
 		MusicCommand.ll.onReady(new ReadyEvent(DiscordBot.getBot(), 0));
-		ap.setVolume(10);
+		ap.setVolume(4);
 		dapm = new DefaultAudioPlayerManager();
 		dapm.registerSourceManager(new YoutubeAudioSourceManager(true));
 		dapm.registerSourceManager(new SoundCloudAudioSourceManager(true));
