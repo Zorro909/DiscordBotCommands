@@ -238,7 +238,7 @@ public class MusicService extends DiscordService {
 					// STOP					
 					if (gmrae.getReactionEmote().getName().equalsIgnoreCase("\u23F9")) {
 						try {
-							if ((int) map.get("\u23F9") >= listeners / 2.0) {
+							if ((Long)map.get("\u23F9") >= listeners / 2.0) {
 								stop();
 							}
 						} catch (Exception e) {
@@ -247,7 +247,7 @@ public class MusicService extends DiscordService {
 						// PAUSE
 					} else if (gmrae.getReactionEmote().getName().equalsIgnoreCase("\u23F8")) {
 						try {
-							if ((int)map.get("\u23F8") >= listeners / 2.0) {
+							if ((Long)map.get("\u23F8") >= listeners / 2.0) {
 								pause();
 							}
 						} catch (Exception e) {
@@ -256,7 +256,7 @@ public class MusicService extends DiscordService {
 						// PLAY
 					} else if (gmrae.getReactionEmote().getName().equalsIgnoreCase("\u25B6")) {
 						try {
-							if ((int)map.get("\u25B6") >= listeners / 2.0) {
+							if ((Long)map.get("\u25B6") >= listeners / 2.0) {
 								unpause();
 							}
 						} catch (Exception e) {
@@ -265,7 +265,7 @@ public class MusicService extends DiscordService {
 						// SKIP
 					} else if (gmrae.getReactionEmote().getName().equalsIgnoreCase("\u23E9")) {
 						try {
-							if ((int)map.get("\u23E9") - 1 >= listeners / 2.0) {
+							if ((Long)map.get("\u23E9") - 1 >= listeners / 2.0) {
 								if (!skipTrack()) {
 									updates.sendMessage("Could not skip Track, maybe the queue is empty?").submit();
 								}
