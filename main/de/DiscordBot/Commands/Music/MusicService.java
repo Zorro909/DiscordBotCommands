@@ -186,7 +186,7 @@ public class MusicService extends DiscordService {
 		boolean edited = false;
 		if (last != null) {
 			if (last.getCreationTime().toLocalDateTime()
-					.toEpochSecond(OffsetDateTime.now().getOffset()) < System.currentTimeMillis() - 2 * 60000
+					.toEpochSecond(OffsetDateTime.now().getOffset()) < System.currentTimeMillis() - 60 * 5
 					&& !forceNew) {
 				last.editMessage(me).submit();
 				edited = true;
@@ -276,7 +276,7 @@ public class MusicService extends DiscordService {
 					}
 				}
 
-			}, 5 * 60 * 1000);
+			}, 5 * 65 * 1000);
 		}
 	}
 
