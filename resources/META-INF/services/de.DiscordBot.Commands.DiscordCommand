@@ -2,14 +2,12 @@ de.DiscordBot.Commands.BeardAvatar
 de.DiscordBot.Commands.ChatLogCommand
 de.DiscordBot.Commands.ChuckNorrisJoke
 de.DiscordBot.Commands.DeviantArtSearch
-de.DiscordBot.Commands.GraphCommand
 de.DiscordBot.Commands.HangmanCommand
 de.DiscordBot.Commands.LotusCommand
 de.DiscordBot.Commands.OsuProfile
 de.DiscordBot.Commands.RandomJoke
 de.DiscordBot.Commands.RandomMeme
 de.DiscordBot.Commands.ReminderCommand
-de.DiscordBot.Commands.TranslateCommand
 de.DiscordBot.Commands.UrbanDict
 de.DiscordBot.Commands.Waifu2X
 de.DiscordBot.Commands.WikiBot

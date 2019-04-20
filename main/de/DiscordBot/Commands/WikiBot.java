@@ -64,9 +64,4 @@ public class WikiBot extends DiscordCommand {
         cfg.setValue("language", "en");
     }
 
-    @Override
-    public boolean isRemoteConfigurable() {
-        return true;
-    }
-
 }

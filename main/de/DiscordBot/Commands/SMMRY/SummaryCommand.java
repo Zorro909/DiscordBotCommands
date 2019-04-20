@@ -36,12 +36,6 @@ public class SummaryCommand extends DiscordCommand {
     public void setupCommandConfig(Guild g, Config cfg) {
         // TODO Auto-generated method stub
 
-    }
-
-    @Override
-    public boolean isRemoteConfigurable() {
-        // TODO Auto-generated method stub
-        return false;
-    }
+    }	
 
 }

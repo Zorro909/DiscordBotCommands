@@ -6,7 +6,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import de.DiscordBot.Config.Config;
-import javautils.HTTPManager.InetManager;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Message;
@@ -23,8 +22,8 @@ public class ChuckNorrisJoke extends DiscordCommand {
 
     public static String fetchRandomJoke() {
         try {
-            Connection con = InetManager.openConnection("http://api.icndb.com/jokes/random");
-            JsonObject jo = new Gson().fromJson(con.get(), JsonObject.class);
+            String get = InetManager.get("http://api.icndb.com/jokes/random");
+            JsonObject jo = new Gson().fromJson(get, JsonObject.class);
             return jo.get("value").getAsJsonObject().get("joke").getAsString().replace("&quot", "\"");
         } catch (IOException e) {
             // TODO Auto-generated catch block
@@ -53,9 +52,4 @@ public class ChuckNorrisJoke extends DiscordCommand {
 
     }
 
-    @Override
-    public boolean isRemoteConfigurable() {
-        // TODO Auto-generated method stub
-        return false;
-    }
 }

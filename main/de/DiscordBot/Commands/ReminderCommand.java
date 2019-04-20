@@ -1,21 +1,13 @@
 package de.DiscordBot.Commands;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.UUID;
 
-import de.DiscordBot.DiscordBot;
 import de.DiscordBot.Config.Config;
-import javautils.mysql.MySQLConfiguration;
-import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 
 public class ReminderCommand extends DiscordCommand {
@@ -26,6 +18,7 @@ public class ReminderCommand extends DiscordCommand {
         super("remind", new String[] { "writeMeAtSomePoint", "dontForget", "secureRemind" },
                 "Reminds you (or someone else) of sth at a later point in time!",
                 "\\remind {@User} [time (ex. 4m/2h/3D/1W/4M/2Y)] [message]");
+        /*
         if (reminder == null) {
             reminder = new Thread(new Runnable() {
 
@@ -93,6 +86,7 @@ public class ReminderCommand extends DiscordCommand {
             });
             reminder.start();
         }
+        */
     }
 
     @Override
@@ -178,12 +172,6 @@ public class ReminderCommand extends DiscordCommand {
     public void setupCommandConfig(Guild g, Config cfg) {
         // TODO Auto-generated method stub
 
-    }
-
-    @Override
-    public boolean isRemoteConfigurable() {
-        // TODO Auto-generated method stub
-        return false;
     }
 
 }

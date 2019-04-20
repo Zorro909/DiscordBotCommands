@@ -26,7 +26,6 @@ import lavalink.client.player.IPlayer;
 import lavalink.client.player.event.PlayerEventListenerAdapter;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
-import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageEmbed;
@@ -48,14 +47,15 @@ public class MusicService extends DiscordService {
 	Link l;
 	IPlayer ap;
 	DefaultAudioPlayerManager dapm;
-	
+	AudioListener audioListener;
+
 	public MusicService(VoiceChannel toJoin, TextChannel textChannel) {
 		l = MusicCommand.ll.getLink(toJoin.getGuild());
 		play = toJoin;
 		updates = textChannel;
 		l.connect(play);
 		ap = l.getPlayer();
-		MusicCommand.ll.onReady(new ReadyEvent(DiscordBot.getBot(), 0));
+		MusicCommand.ll.onReady(new ReadyEvent(DiscordBot.discordJDABot(), 0));
 		ap.setVolume(4);
 		dapm = new DefaultAudioPlayerManager();
 		dapm.registerSourceManager(new YoutubeAudioSourceManager(true));
@@ -66,60 +66,8 @@ public class MusicService extends DiscordService {
 	@Override
 	public void run() {
 		if (!queue.isEmpty()) {
-			ap.addListener(new PlayerEventListenerAdapter() {
-
-				@Override
-				public void onPlayerPause(IPlayer player) {
-					sendMusicPlayer(MusicPlayerState.PAUSED, true);
-				}
-
-				@Override
-				public void onPlayerResume(IPlayer player) {
-					sendMusicPlayer(MusicPlayerState.PLAYING, true);
-				}
-
-				@Override
-				public void onTrackStart(IPlayer player, AudioTrack track) {
-					sendMusicPlayer(MusicPlayerState.PLAYING, true);
-				}
-
-				@Override
-				public void onTrackEnd(IPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
-					if (endReason == AudioTrackEndReason.LOAD_FAILED) {
-						updates.sendMessage(new MessageBuilder()
-								.append("Track " + track.getInfo().title + " couldn't be loaded... Skipping").build());
-					}
-					if (endReason.mayStartNext) {
-						if (queue.isEmpty()) {
-							stop();
-							return;
-						}
-						try {
-							player.playTrack(queue.take());
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
-
-				}
-
-				@Override
-				public void onTrackStuck(IPlayer player, AudioTrack track, long thresholdMs) {
-					updates.sendMessage(new MessageBuilder()
-							.append("Track " + track.getInfo().title + " got stuck... Skipping").build());
-					if (queue.isEmpty()) {
-						stop();
-						return;
-					}
-					try {
-						player.playTrack(queue.take());
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			});
+			audioListener = new AudioListener(this);
+			ap.addListener(audioListener);
 			play.getGuild().getAudioManager().openAudioConnection(play);
 		}
 		while ((!queue.isEmpty() || paused || ap.getPlayingTrack() != null) && !stop) {
@@ -145,17 +93,17 @@ public class MusicService extends DiscordService {
 	}
 
 	public void pause() {
-		if(!stop) {
-		pausedAt = System.currentTimeMillis();
-		paused = true;
-		ap.setPaused(true);
+		if (!stop) {
+			pausedAt = System.currentTimeMillis();
+			paused = true;
+			ap.setPaused(true);
 		}
 	}
 
 	public void unpause() {
-		if(!stop) {
-		paused = false;
-		ap.setPaused(false);
+		if (!stop) {
+			paused = false;
+			ap.setPaused(false);
 		}
 	}
 
@@ -172,7 +120,8 @@ public class MusicService extends DiscordService {
 		if (at != null) {
 			eb.setAuthor(at.getInfo().author);
 			eb.addField("Playing: " + at.getInfo().title,
-					String.format("%02d:%02d:%02d / %02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(ap.getTrackPosition()),
+					String.format("%02d:%02d:%02d / %02d:%02d:%02d",
+							TimeUnit.MILLISECONDS.toHours(ap.getTrackPosition()),
 							TimeUnit.MILLISECONDS.toMinutes(ap.getTrackPosition()) % 60,
 							TimeUnit.MILLISECONDS.toSeconds(ap.getTrackPosition()) % 60,
 							TimeUnit.MILLISECONDS.toHours(at.getDuration()),
@@ -221,24 +170,27 @@ public class MusicService extends DiscordService {
 					}
 					System.out.println(gmrae.getReactionEmote().getName());
 					Message m = gmrae.getChannel().getMessageById(gmrae.getMessageId()).complete();
-					Map<Object, Object> map = m.getReactions().stream().collect(Collectors.toMap(r -> ((MessageReaction)r).getReactionEmote().getName(), r -> ((MessageReaction)r).getUsers().complete().stream().filter(u -> {
-						if(u.isBot())return false;
-						if(play.getGuild().getMember(u).getVoiceState().getAudioChannel()==play) {
-							return true;
-						}
-						return false;
-					}).count()));
+					Map<Object, Object> map = m.getReactions().stream()
+							.collect(Collectors.toMap(r -> ((MessageReaction) r).getReactionEmote().getName(),
+									r -> ((MessageReaction) r).getUsers().complete().stream().filter(u -> {
+										if (u.isBot())
+											return false;
+										if (play.getGuild().getMember(u).getVoiceState().getAudioChannel() == play) {
+											return true;
+										}
+										return false;
+									}).count()));
 					double listeners = 0;
-					for(Member me : play.getMembers()) {
-						if(!me.getUser().isBot()) {
+					for (Member me : play.getMembers()) {
+						if (!me.getUser().isBot()) {
 							listeners++;
 						}
 					}
-					
-					// STOP					
+
+					// STOP
 					if (gmrae.getReactionEmote().getName().equalsIgnoreCase("\u23F9")) {
 						try {
-							if ((Long)map.get("\u23F9") >= listeners / 2.0) {
+							if ((Long) map.get("\u23F9") >= listeners / 2.0) {
 								stop();
 							}
 						} catch (Exception e) {
@@ -247,7 +199,7 @@ public class MusicService extends DiscordService {
 						// PAUSE
 					} else if (gmrae.getReactionEmote().getName().equalsIgnoreCase("\u23F8")) {
 						try {
-							if ((Long)map.get("\u23F8") >= listeners / 2.0) {
+							if ((Long) map.get("\u23F8") >= listeners / 2.0) {
 								pause();
 							}
 						} catch (Exception e) {
@@ -256,7 +208,7 @@ public class MusicService extends DiscordService {
 						// PLAY
 					} else if (gmrae.getReactionEmote().getName().equalsIgnoreCase("\u25B6")) {
 						try {
-							if ((Long)map.get("\u25B6") >= listeners / 2.0) {
+							if ((Long) map.get("\u25B6") >= listeners / 2.0) {
 								unpause();
 							}
 						} catch (Exception e) {
@@ -265,7 +217,7 @@ public class MusicService extends DiscordService {
 						// SKIP
 					} else if (gmrae.getReactionEmote().getName().equalsIgnoreCase("\u23E9")) {
 						try {
-							if ((Long)map.get("\u23E9") - 1 >= listeners / 2.0) {
+							if ((Long) map.get("\u23E9") - 1 >= listeners / 2.0) {
 								if (!skipTrack()) {
 									updates.sendMessage("Could not skip Track, maybe the queue is empty?").submit();
 								}
@@ -282,7 +234,7 @@ public class MusicService extends DiscordService {
 
 	protected boolean skipTrack() {
 		try {
-			if(queue.isEmpty()) {
+			if (queue.isEmpty()) {
 				return false;
 			}
 			ap.playTrack(queue.take());
@@ -298,13 +250,23 @@ public class MusicService extends DiscordService {
 
 	protected void stop() {
 		try {
-		if(ap.getPlayingTrack()!=null)ap.stopTrack();
-		ap.playTrack(null);
-		}catch(Exception e) {}
+			if (ap.getPlayingTrack() != null)
+				ap.stopTrack();
+			ap.playTrack(null);
+		} catch (Exception e) {
+		}
+		ap.removeListener(audioListener);
 		l.disconnect();
-		
+
 		stop = true;
 		MusicCommand.guildMusic.remove(play.getGuild().getId());
+		play = null;
+		updates = null;
+		queue = null;
+		l = null;
+		ap = null;
+		dapm = null;
+		audioListener = null;
 	}
 
 	@Override
@@ -368,4 +330,65 @@ public class MusicService extends DiscordService {
 		}
 	}
 
+}
+
+class AudioListener extends PlayerEventListenerAdapter {
+
+	private MusicService ms;
+
+	AudioListener(MusicService ms) {
+		this.ms = ms;
+	}
+
+	@Override
+	public void onPlayerPause(IPlayer player) {
+		ms.sendMusicPlayer(MusicPlayerState.PAUSED, true);
+	}
+
+	@Override
+	public void onPlayerResume(IPlayer player) {
+		ms.sendMusicPlayer(MusicPlayerState.PLAYING, true);
+	}
+
+	@Override
+	public void onTrackStart(IPlayer player, AudioTrack track) {
+		ms.sendMusicPlayer(MusicPlayerState.PLAYING, true);
+	}
+
+	@Override
+	public void onTrackEnd(IPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
+		if (endReason == AudioTrackEndReason.LOAD_FAILED) {
+			ms.updates.sendMessage(new MessageBuilder()
+					.append("Track " + track.getInfo().title + " couldn't be loaded... Skipping").build());
+		}
+		if (endReason.mayStartNext) {
+			if (ms.queue.isEmpty()) {
+				ms.stop();
+				return;
+			}
+			try {
+				player.playTrack(ms.queue.take());
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+	}
+
+	@Override
+	public void onTrackStuck(IPlayer player, AudioTrack track, long thresholdMs) {
+		ms.updates.sendMessage(
+				new MessageBuilder().append("Track " + track.getInfo().title + " got stuck... Skipping").build());
+		if (ms.queue.isEmpty()) {
+			ms.stop();
+			return;
+		}
+		try {
+			player.playTrack(ms.queue.take());
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }

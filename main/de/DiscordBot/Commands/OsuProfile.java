@@ -12,7 +12,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import de.DiscordBot.Config.Config;
-import javautils.HTTPManager.InetManager;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.Guild;
@@ -32,12 +31,10 @@ public class OsuProfile extends DiscordCommand {
         if (args.length < 1) {
             return new MessageBuilder().append("Wrong Usage: " + getUsage());
         }
-        Connection c;
         String json = "";
         try {
-            c = InetManager.openConnection(
+            json = InetManager.get(
                     "https://osu.ppy.sh/api/get_user?k=a13f90c09608958770e6a897fed71e8c05e75557&u=" + args[0]);
-            json = c.get();
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -96,12 +93,6 @@ public class OsuProfile extends DiscordCommand {
     @Override
     public void setupCommandConfig(Guild g, Config cfg) {
 
-    }
-
-    @Override
-    public boolean isRemoteConfigurable() {
-        // TODO Auto-generated method stub
-        return false;
     }
 
 }

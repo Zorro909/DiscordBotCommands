@@ -31,13 +31,7 @@ public class RandomJoke extends DiscordCommand {
     @Override
     public void setupCommandConfig(Guild g, Config cfg) {
         cfg.setValue("defaultSubreddit", "jokes");
-
     }
 
-    @Override
-    public boolean isRemoteConfigurable() {
-        // TODO Auto-generated method stub
-        return true;
-    }
 
 }

@@ -54,31 +54,8 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.10</version>
 			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>buildnumber-maven-plugin</artifactId>
-				<version>1.4</version>
-				<executions>
-					<execution>
-						<id>buildnumber</id>
-						<phase>validate</phase>
-						<goals>
-							<goal>create</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<format>{0,number}</format>
-					<items>
-						<item>buildNumber</item>
-					</items>
-					<doCheck>false</doCheck>
-					<doUpdate>false</doUpdate>
-					<revisionOnScmFailure>unknownbuild</revisionOnScmFailure>
-				</configuration>
-			</plugin>
 		</plugins>
-		<finalName>${project.artifactId}-${project.version}.${buildNumber}</finalName>
+		<finalName>${project.artifactId}-${project.version}</finalName>
 	</build>
 	<repositories>
 		<repository>
@@ -99,34 +76,16 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.github.Frederikam</groupId>
-			<artifactId>Lavalink</artifactId>
-			<version>1bfb2276dd</version>
-			<exclusions>
-				<exclusion>
-					<!-- Exclude the server module -->
-					<groupId>com.github.Frederikam.Lavalink</groupId>
-					<artifactId>Lavalink-Server</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
 			<groupId>DiscordBot</groupId>
 			<artifactId>DiscordBot</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 			<scope>compile</scope>
-			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
 			<version>2.18.3</version>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.sedmelluq</groupId>
-			<artifactId>lavaplayer</artifactId>
-			<version>1.2.58</version>
 		</dependency>
 	</dependencies>
 </project>

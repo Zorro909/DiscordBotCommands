@@ -6,8 +6,7 @@ import java.util.HashMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-import javautils.HTTPManager.Connection;
-import javautils.HTTPManager.InetManager;
+import de.DiscordBot.Commands.InetManager;
 
 public class SmmryAPI {
 
@@ -120,16 +119,13 @@ class SummaryBuilder{
 			if(extern) {
 				url+="&SM_URL=" + this.url;
 			}
-			Connection con = InetManager.openConnection(url);
 			String result = "";
 			if(!extern) {
 				HashMap<String, String> req = new HashMap<String, String>();
 				req.put("sm_api_input", text);
-				con.initPost(req);
-				result = con.post();
+				result = InetManager.post(url, req);
 			} else {
-				con.initGet(false, null);
-				result = con.get();
+				result = InetManager.get(url);
 			}
 			Gson gson = new Gson();
 			JsonObject jo = gson.fromJson(result, JsonObject.class);

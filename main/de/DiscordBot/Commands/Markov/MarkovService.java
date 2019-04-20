@@ -23,7 +23,7 @@ public class MarkovService extends DiscordService {
 	public void run() {
 		global = new Markov();
 		ChatLog cl = CommandExecutor.getChatLog();
-		for (Guild g : DiscordBot.getBot().getGuilds()) {
+		for (Guild g : DiscordBot.discordJDABot().getGuilds()) {
 			for (ChatLogChannel clc : cl.listChannels(g).values()) {
 				clc.load();
 				for (ChatLogMessage clm : clc.clm) {
@@ -37,7 +37,7 @@ public class MarkovService extends DiscordService {
 			}
 		}
 
-		DiscordBot.getBot().addEventListener((listener = new ListenerAdapter() {
+		DiscordBot.discordJDABot().addEventListener((listener = new ListenerAdapter() {
 			@Override
 			public void onMessageReceived(MessageReceivedEvent event) {
 				if (event.getChannelType() == ChannelType.TEXT) {
@@ -95,7 +95,7 @@ public class MarkovService extends DiscordService {
 	@Override
 	public void shutdown() {
 		service = null;
-		DiscordBot.getBot().removeEventListener(listener);
+		DiscordBot.discordJDABot().removeEventListener(listener);
 		global = null;
 	}
 

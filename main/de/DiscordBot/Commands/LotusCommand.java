@@ -24,10 +24,4 @@ public class LotusCommand extends DiscordCommand {
 
     }
 
-    @Override
-    public boolean isRemoteConfigurable() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
 }

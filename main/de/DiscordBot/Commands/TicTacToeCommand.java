@@ -24,7 +24,7 @@ public class TicTacToeCommand extends DiscordCommand implements EventListener {
     public TicTacToeCommand() {
         super("tictactoe", new String[] {}, "Let's you play a round of tic tac toe against someone else",
                 "\\tictactoe @Opponent");
-        DiscordBot.getBot().addEventListener(this);
+        DiscordBot.discordJDABot().addEventListener(this);
 
         TicTacToeWins = CounterAchievement.createStaticCounterAchievement("tictactoe_wins", "TicTacToeAchievement");
     }
@@ -172,12 +172,6 @@ public class TicTacToeCommand extends DiscordCommand implements EventListener {
     @Override
     public void setupCommandConfig(Guild g, Config cfg) {
         // TODO Auto-generated method stub
-    }
-
-    @Override
-    public boolean isRemoteConfigurable() {
-        // TODO Auto-generated method stub
-        return false;
     }
 
     HashMap<MessageChannel, Game> state = new HashMap<MessageChannel, Game>();

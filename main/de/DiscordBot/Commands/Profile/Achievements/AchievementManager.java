@@ -1,15 +1,12 @@
 package de.DiscordBot.Commands.Profile.Achievements;
 
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.map.LinkedMap;
+
+import com.google.common.collect.Lists;
 
 import de.DiscordBot.Commands.Profile.ProfileCommand;
 import de.DiscordBot.Commands.Profile.Achievements.Commands.CommandAchievement;
@@ -17,7 +14,6 @@ import de.DiscordBot.Config.Config;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
-import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 
 public class AchievementManager {
@@ -26,6 +22,7 @@ public class AchievementManager {
 
 	static {
 		new CommandAchievement();
+		new MehChievement();
 	}
 
 	public static void processMessage(Message m, Config c) {
@@ -37,18 +34,18 @@ public class AchievementManager {
 	}
 
 	public static List<String> listAchievedAchievements(User u) {
-		Pattern p = Pattern.compile("^achievement_" + u.getId() + "_(.*)$");
-		ArrayList<String> keys = ProfileCommand.config.getKeys(p.pattern());
-		Map<String, Boolean> bools = ProfileCommand.config.getBooleanValues(keys.toArray(new String[keys.size()]));
-		
-		return bools.entrySet().stream()
-				.filter((Map.Entry<String, Boolean> entry) -> entry.getValue())
-				.map((Map.Entry<String, Boolean> entry) -> entry.getKey().split("_",3)[2])
-				.collect(Collectors.toList());
+		String ach = ProfileCommand.config.getValue("achievements_" + u.getId(), "");
+		if(ach==null||ach.isEmpty()) {
+			return new ArrayList<String>();
+		}
+		return Lists.newArrayList(ach.split(","));
 	}
 
 	public static void achievedAchievement(MessageChannel tc, User u, String achievement) {
-		ProfileCommand.config.setValue("achievement_" + u.getId() + "_" + achievement, true);
+		List<String> achievements = listAchievedAchievements(u);
+		achievements.add(achievement);
+		ProfileCommand.config.setValue("achievements_" + u.getId(),
+				achievements.stream().collect(Collectors.joining(", ")));
 		MessageBuilder mb = new MessageBuilder();
 		Message m = mb.append("Hoooray ").append(u)
 				.append(", you unlocked the Achievement \"" + achievement + "\" :smile:").build();

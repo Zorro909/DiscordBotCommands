@@ -100,10 +100,4 @@ public class RandomMeme extends DiscordCommand {
         cfg.setValue("defaultSubreddit", "memes");
     }
 
-    @Override
-    public boolean isRemoteConfigurable() {
-        // TODO Auto-generated method stub
-        return true;
-    }
-
 }

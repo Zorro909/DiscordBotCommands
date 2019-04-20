@@ -86,10 +86,4 @@ public class Waifu2X extends DiscordCommand {
 
     }
 
-    @Override
-    public boolean isRemoteConfigurable() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
 }

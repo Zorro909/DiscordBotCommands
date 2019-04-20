@@ -25,16 +25,17 @@ public class MusicCommand extends DiscordCommand {
     public MusicCommand() {
         super("play", new String[] { "yt", "scloud" }, "Plays music in your current channel",
                 "\n\\play [URL]\n\\yt [search|URL]\n\\scloud");
-        ll = new Lavalink(DiscordBot.getBot().getSelfUser().getId(), 1, (i) -> {
-            return DiscordBot.getBot();
+        ll = new Lavalink(DiscordBot.discordJDABot().getSelfUser().getId(), 1, (i) -> {
+            return DiscordBot.discordJDABot();
         });
+        ll.setAutoReconnect(true);
         try {
-            ll.addNode(new URI("ws://dev.jectrum.de:18954"), "DVaeBSsWuZ303");
+            ll.addNode(new URI("ws://lavalink:13452"), "youshallnotpass");
         } catch (URISyntaxException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        DiscordBot.getBot().addEventListener(ll);
+        DiscordBot.discordJDABot().addEventListener(ll);
     }
 
     @Override
@@ -95,12 +96,6 @@ public class MusicCommand extends DiscordCommand {
     public void setupCommandConfig(Guild g, Config cfg) {
         // TODO Auto-generated method stub
 
-    }
-
-    @Override
-    public boolean isRemoteConfigurable() {
-        // TODO Auto-generated method stub
-        return false;
     }
 
 }
